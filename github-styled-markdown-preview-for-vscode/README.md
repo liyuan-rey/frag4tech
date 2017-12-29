@@ -1,14 +1,19 @@
 # 在 VSCode 预览中使用 GitHub 的中文 Markdown 样式
 
-## 最终效果
+## 效果展示
 
-![VSCode 默认](./before.png)
++ 修改后的预览样式
 
 ![GitHub 样式](./after.png)
 
++ VSCode 默认预览样式
+
+![VSCode 默认](./before.png)
+
++ [导出 PDF 样例](./sample.pdf)（无固定宽度）
+
 ![导出 PDF（无固定宽度）](./pdf.png)
 
-[导出 PDF](./sample.pdf)
 
 ## 背景
 
