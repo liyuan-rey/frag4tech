@@ -6,14 +6,9 @@
 
 ![GitHub 样式](./after.png)
 
-+ VSCode 默认预览样式
-
-![VSCode 默认](./before.png)
-
 + [导出 PDF 样例](./sample.pdf)（无固定宽度）
 
 ![导出 PDF（无固定宽度）](./pdf.png)
-
 
 ## 背景
 
@@ -39,15 +34,15 @@
 
 这篇文章中对 `中日韩(CJK)` 等文字字体有一些推荐：
 
-| 字体名 | 包含字符 | 描述 |
-| --- | --- | --- |
-| Segoe UI |  Latin, Greek, Cyrillic, and Arabic characters |  |
-| Microsoft YaHei | Latin, Chinese (Simplified) | 包含简体中文字符，Latin 字符部分是基于 Segoe UI 的定制版 |
-| Microsoft JhengHei | Latin, Chinese (Traditional) | 包含繁体中文字符，Latin 字符部分是基于 Segoe UI 的定制版 |
-| Meiryo | Latin, Japanese | 包含日文字符，Latin 字符部分是基于 Verdana 的定制版 |
-| Malgun Gothic | Latin, Korean | 包含韩文字符，Latin 字符部分是基于 Segoe UI 的定制版 |
-| Gisha | Latin, Hebrew | 包含希伯来文字符 |
-| Leelawadee | Latin, Thai | 包含泰文字符 |
+| 字体名             | 包含字符                                      | 描述                                                     |
+| ------------------ | --------------------------------------------- | -------------------------------------------------------- |
+| Segoe UI           | Latin, Greek, Cyrillic, and Arabic characters |                                                          |
+| Microsoft YaHei    | Latin, Chinese (Simplified)                   | 包含简体中文字符，Latin 字符部分是基于 Segoe UI 的定制版 |
+| Microsoft JhengHei | Latin, Chinese (Traditional)                  | 包含繁体中文字符，Latin 字符部分是基于 Segoe UI 的定制版 |
+| Meiryo             | Latin, Japanese                               | 包含日文字符，Latin 字符部分是基于 Verdana 的定制版      |
+| Malgun Gothic      | Latin, Korean                                 | 包含韩文字符，Latin 字符部分是基于 Segoe UI 的定制版     |
+| Gisha              | Latin, Hebrew                                 | 包含希伯来文字符                                         |
+| Leelawadee         | Latin, Thai                                   | 包含泰文字符                                             |
 
 这些字体都为 ClearType 做了优化，在 ClearType 技术支持下屏幕显示效果很好。其中部分字体及其变体字体也适用于打印。
 
@@ -55,42 +50,42 @@
 
 ## 配置 VSCode
 
-接下来的事情就比较简单了，下载上面提到的 GitHubGist 中的 `github-markdown.css` 到本地。我一般把它放在用户目录下，也即 `%USERPROFILE%\github-markdown.css`。
+接下来的事情就比较简单了，下载上面提到的 GitHubGist 中的 `github-markdown.css` 到本机目录（我一般把它放在用户目录，也即 Windows 的 `%USERPROFILE%` 环境变量所指向的目录）。
 
-修改 `%USERPROFILE%\github-markdown.css` 文件内容，指定中文字体，如下：
+> 注意，需将下面步骤的代码片段中的 `%USERPROFILE%` 修改为实际路径文本。
+
+1. 修改 `github-markdown.css` 文件内容，指定中文字体，如下：
 
 ```diff
 body {
 -   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-+   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei UI Light";
++   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei UI";
 }
 ```
 
-修改 VSCode 用户设置文件，增加或修改如下配置项：
+这里是修改后的 [github-markdown.css](./github-markdown.css)。
+
+1. 修改 VSCode 用户设置文件，增加或修改如下配置项：
 
 ```json
 {
-    // ...
-
     "editor.fontFamily": "Consolas, 'Courier New', monospace, 'Segoe UI', 'Microsoft YaHei UI'",
 
     "markdown.styles": [
-        "file:///%USERPROFILE%/github-markdown.css" // 注意，需将 %USERPROFILE% 修改为实际路径
+        "file:///%USERPROFILE%/github-markdown.css"
     ],
     "markdown.preview.fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'HelveticaNeue-Light', 'Ubuntu', 'Droid Sans', sans-serif, 'Microsoft YaHei UI'",
-
-    // ...
 }
 ```
 
-如果使用了 `Markdown PDF` 插件，也可以做了相应配置，以便从 Markdown 导出 PDF 时也具有同样的样式效果：
+1. 如果使用了 `Markdown PDF` 插件，也可以做了相应配置，以便从 Markdown 导出 PDF 时也具有同样的样式效果：
 
 ```json
 {
     // ...
 
     "markdown-pdf.styles": [
-        "file:///C:/Users/liyuan/github-markdown.css"
+        "file:///%USERPROFILE%/github-markdown.css"
     ],
     "markdown-pdf.highlightStyle": "github.css",
 
