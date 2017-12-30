@@ -82,14 +82,10 @@ body {
 
 ```json
 {
-    // ...
-
     "markdown-pdf.styles": [
         "file:///%USERPROFILE%/github-markdown.css"
     ],
     "markdown-pdf.highlightStyle": "github.css",
-
-    // ...
 }
 ```
 
