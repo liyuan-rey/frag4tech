@@ -4,11 +4,11 @@
 
 + 修改后的预览样式
 
-![GitHub 样式](./after.png){:width="886px"}
+![GitHub 样式](./after.png)
 
 + [导出 PDF 样例](./sample.pdf)（无固定宽度）
 
-![导出 PDF（无固定宽度）](./pdf.png){:width="859px"}
+![导出 PDF（无固定宽度）](./pdf.png)
 
 ## 背景
 
