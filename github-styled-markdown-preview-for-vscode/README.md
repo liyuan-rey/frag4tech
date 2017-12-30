@@ -8,7 +8,7 @@
 
 + [导出 PDF 样例](./sample.pdf)（无固定宽度）
 
-![导出 PDF（无固定宽度）](./pdf.png){:width="1010px"}
+![导出 PDF（无固定宽度）](./pdf.png){:width="859px"}
 
 ## 背景
 
@@ -30,7 +30,7 @@
 
 ## 中文字体选择
 
-[微软官方 Windows 桌面视觉设计指南](https://msdn.microsoft.com/en-us/library/windows/desktop/dn742483(v=vs.85).aspx)
+[微软 Windows 桌面视觉设计指南](https://msdn.microsoft.com/en-us/library/windows/desktop/dn742483(v=vs.85).aspx)
 
 这篇文章中对 `中日韩(CJK)` 等文字字体有一些推荐：
 
