@@ -1,4 +1,4 @@
-# ShadowSockets Server 安装记录
+# 在 Ubuntu 上安装 Shadowsocks Server
 
 ## 建立虚拟机
 
@@ -61,7 +61,7 @@ usermod -G adm,cdrom,sudo,dip,plugdev -a sam    # 为用户 sam 指定管理员�
   deb-src http://mirrors.aliyun.com/ubuntu/ xenial-updates main multiverse restricted universe
   ```
 
-  > aliyun官网上说若使用阿里云服务器，将包源的域名从 mirrors.aliyun.com 改为 mirrors.aliyuncs.com，不占用公网流量，但我尝试修改后反而更新速度很慢。
+  > aliyun 官网上说若使用阿里云服务器，将包源的域名从 mirrors.aliyun.com 改为 mirrors.aliyuncs.com，不占用公网流量，但我尝试修改后反而更新速度很慢。
   > 其实 ECS Linux 服务器保持 `/etc/apt/sources.list` 内容为空，直接 `apt-get update` 就可以直接从 `mirrors.cloud.aliyuncs.com` 更新包源。
 
   ```shell
@@ -118,7 +118,7 @@ usermod -G adm,cdrom,sudo,dip,plugdev -a sam    # 为用户 sam 指定管理员�
 
 ## 配置 python3 pip 环境
 
-许多 ShadowSockets Server 部署都采用了 Python 2.x 版本，尝试以后发现它对 Python 3.x 也是支持的.
+许多 Shadowsocks Server 部署都采用了 Python 2.x 版本，尝试以后发现它对 Python 3.x 也是支持的.
 
 下面运行环境将采用 Ubuntu Server 16.04 自带 `Python 3.5.2`。注意 Ubuntu Server 16.04 默认没有安装 `pip` 工具，需要自己安装。
 
@@ -168,21 +168,21 @@ index-url=https://mirrors.aliyun.com/pypi/simple/
 trusted-host=mirrors.aliyun.com
 ```
 
-## 安装和配置 ShadowSockets Server
+## 安装和配置 Shadowsocks Server
 
-安装加密算法包，ShadowSockets Server 推荐的加密算法 `aes-256-cfb` 需要使用它。
+安装加密算法包，Shadowsocks Server 推荐的加密算法 `aes-256-cfb` 需要使用它。
 
 ```shell
 sudo apt-get install python-m2crypto
 ```
 
-安装 ShadowSockets。
+安装 Shadowsocks。
 
 ```shell
 sudo -H pip3 install shadowsocks
 ```
 
-创建 ShadowSockets Server 配置文件。
+创建 Shadowsocks Server 配置文件。
 
 ```shell
 sudo vi /etc/shadowsocks/config.json
@@ -210,9 +210,9 @@ sudo vi /etc/shadowsocks/config.json
 sudo iptables -I INPUT -p tcp --dport 8388 -j ACCEPT
 ```
 
-### 管理 ShadowSockets Server
+### 管理 Shadowsocks Server
 
-#### 前台运行 ssserver
+#### 前台运行 `ssserver`
 
 ```shell
 sudo ssserver -c /etc/shadowsocks/config.json
@@ -227,7 +227,7 @@ jobs -l    # 查看后台进程列表
 fg %<jobid>    # 将 <jobid> 任务转到前台
 ```
 
-终止 ssserver 进程可以使用下列命令。
+终止 `ssserver` 进程可以使用下列命令。
 
 ```shell
 kill <pid>    # pid 可以从 jobs -l 回显中看到，或直接使用下面的命令
@@ -236,7 +236,7 @@ ps -ef | grep /usr/local/bin/ssserver | grep -v grep | tr -s " "|cut -d " " -f2 
 
 #### 后台运行 ssserver
 
-以后台进程方式启动/停止/重启 ShadowSockets Server 可以使用如下命令。
+以后台进程方式启动/停止/重启 Shadowsocks Server 可以使用如下命令。
 
 ```shell
 ssserver -c /etc/shadowsocks/config.json -d start    # 后台运行 ssserver
@@ -269,7 +269,7 @@ sudo chmod -c +x /etc/rc.local
 
 ### 优化（未确认）
 
-Optimeze TCP Connection
+Optimize TCP Connection
 
 Increase TCP link limit add following configuration to /etc/security/limits.conf file:
 
@@ -321,7 +321,7 @@ net.ipv4.tcp_mtu_probing = 1
 net.ipv4.tcp_congestion_control = hybla
 ```
 
-Reload configuration and set ShadowSocks lanuch params `fast_open: true`:
+Reload configuration and set Shadowsocks launch params `fast_open: true`:
 
 ```shell
 sudo sysctl -p
