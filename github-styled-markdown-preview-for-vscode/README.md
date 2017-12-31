@@ -56,38 +56,38 @@
 
 1. 修改 `github-markdown.css` 文件内容，指定中文字体，如下：
 
-```diff
-body {
--   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-+   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei UI";
-}
-```
+    ```diff
+    body {
+    -   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    +   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei UI";
+    }
+    ```
 
-这里是修改后的 [github-markdown.css](./github-markdown.css)。
+    这里是修改后的 [github-markdown.css](./github-markdown.css)。
 
 1. 修改 VSCode 用户设置文件，增加或修改如下配置项：
 
-```json
-{
-    "editor.fontFamily": "Consolas, 'Courier New', monospace, 'Segoe UI', 'Microsoft YaHei UI'",
+    ```json
+    {
+        "editor.fontFamily": "Consolas, 'Courier New', monospace, 'Segoe UI', 'Microsoft YaHei UI'",
 
-    "markdown.styles": [
-        "file:///%USERPROFILE%/github-markdown.css"
-    ],
-    "markdown.preview.fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'HelveticaNeue-Light', 'Ubuntu', 'Droid Sans', sans-serif, 'Microsoft YaHei UI'",
-}
-```
+        "markdown.styles": [
+            "file:///%USERPROFILE%/github-markdown.css"
+        ],
+        "markdown.preview.fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'HelveticaNeue-Light', 'Ubuntu', 'Droid Sans', sans-serif, 'Microsoft YaHei UI'",
+    }
+    ```
 
 1. 如果使用了 `Markdown PDF` 插件，也可以做了相应配置，以便从 Markdown 导出 PDF 时也具有同样的样式效果：
 
-```json
-{
-    "markdown-pdf.styles": [
-        "file:///%USERPROFILE%/github-markdown.css"
-    ],
-    "markdown-pdf.highlightStyle": "github.css",
-}
-```
+    ```json
+    {
+        "markdown-pdf.styles": [
+            "file:///%USERPROFILE%/github-markdown.css"
+        ],
+        "markdown-pdf.highlightStyle": "github.css",
+    }
+    ```
 
 ## 其它问题
 
