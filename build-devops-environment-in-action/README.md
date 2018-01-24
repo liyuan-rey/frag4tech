@@ -29,7 +29,7 @@ Ubuntu Server v16.04
 
   使用 jerkins 作为部署构建服务器（与开发构建服务器相区别），当发布服务器中有新内容时，触发生产环境重新部署的动作。
 
-???
++ ???
 + Docker 镜像服务
 + mongodb 镜像
 + Tomcat 镜像
@@ -40,6 +40,8 @@ Ubuntu Server v16.04
 ### Docker CE 运行环境
 
 在 Ubuntu Server v16.04 上安装 Docker CE。
+
+> 参考文章：[Get Docker CE for Ubuntu](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#set-up-the-repository)
 
 ```shell
 # step 1: 安装必要的一些系统工具
@@ -113,6 +115,70 @@ EOF
 ```shell
 sudo systemctl daemon-reload
 sudo systemctl restart docker
+```
+
+设置 docker 随系统自启动，
+
+```shell
+sudo systemctl enable docker
+# 取消自启动 sudo systemctl disable docker
+```
+
+#### Manage Docker as a non-root user
+
+参考官方文章：[Manage Docker as a non-root user](https://docs.docker.com/engine/installation/linux/linux-postinstall/)
+
+### git server
+
+业务系统也是运行在容器环境中的，所以业务系统不再像以往那样发布成 java war 包，而是发布为容器镜像，镜像是以 Dockerfile 的方式来描述的。
+
+生产环境的部署过程，主要是在部署构建服务器上基于 Dockerfile 构建产生相关业务系统镜像，再到应用服务器上基于镜像实例化容器，从而得到业务服务。
+
+在复杂的生产环境中部署，需要对线上系统的版本做跟踪，以便在状况出现时能更快的进行定位、扩展、修复、回滚等处理。所以生产环境的 Dockerfile 需要进行版本控制，以便在需要时候进行跟踪和追溯。
+
+生产环境的发布服务器使用 git server 来搭建，能够方便的达成上述目标。
+
+git server 部署在内网，不面向用户，是内部使用的。对于部署人员来说只读权限就够了，对于开发人员来说需要有读和写权限以便能将业务系统的 Dockerfile 提交上来。
+
+只读访问我们采用 GitWeb 来达成，读写访问我们采用 SSH + git-shell 免密方式达成。
+
+这里我们不采用 `docker store` 上贡献者发布的 GitWeb 包，而是以与 Host 操作系统相同的 ubuntu 16.04 系统镜像开始从头搭建。
+
+镜像层次如下：
+
++ ubuntu
++ ubuntu-nginx
++ ubuntu-nginx-gitweb
+
+具体内容请参考：[Dockerfile](./Dockerfile)
+
+```shell
+sudo docker image pull ubuntu
+sudo docker image pull ubuntu:latest
+sudo docker image pull ubuntu:16.04
+```
+
+这三个命令效果相同，不带版本描述默认会获取最新 LTS 版本，效果和加 `latest` 标识相同，而当前最新的 LTS 版本正是 `16.04`。
+
+ubuntu 默认镜像包含 `apt` 工具，但不包含 `nginx`、`git` 等，需要手动安装。
+
+
+首先运行 ubuntu 容器，进入交互模式。
+
+```shell
+sudo docker run -it ubuntu /bin/bash
+```
+
+在容器 bash 中运行：
+
+```shell
+cp /etc/apt/source.list /etc/apt/source.list.backup
+```
+
+修改 apt 工具从 aliyun 镜像获取软件包。
+
+```shell
+sudo docker run ubuntu bash
 ```
 
 ### Docker 镜像服务
