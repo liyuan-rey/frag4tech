@@ -48,21 +48,29 @@ Windows Registry Editor Version 5.00
 
 这里是我常用的终端代码页、字体的设置：[console-codepage-font.reg](./console-codepage-font.reg)
 
+### 注意
+
+上述修改默认代码页的方式不适用于以快捷方式启动的控制台程序，因为快捷方式文件（.lnk）中包含有代码页设置，此设置默认为系统控制面板 `区域` 设置所指定的 `非 Unicode 程序的语言` 对应的代码页，且不能通过快捷方式的右键“属性”修改，它会比注册表项更优先的发挥作用。
+
+例如开始菜单中的程序项、固定到“开始”屏幕的程序项、固定到任务栏的程序项、自己创建的快捷方式等都会在有相应 `.lnk` 中保有自己的代码页设置。只有直接运行的程序，比如通过“运行”命令 `[Win] + [R]` 或直接双击 EXE 执行文件，上述注册表设置才会生效。
+
 这个帖子里有许多关于这方面的讨论，有兴趣的可以参考查看：[https://github.com/Microsoft/WSL/issues/757](https://github.com/Microsoft/WSL/issues/757)
 
 ## 处理办法 3
 
 **放弃 Windows 默认终端，使用替代终端程序。**
 
-使用组合字体可能有显示瑕疵，修改终端代码页和字体有中文显示限制，那么放弃也许是一种选择。
+上面两种方法基于系统默认终端，其中使用组合字体可能有显示瑕疵，修改终端代码页和字体也有快捷方式限制，也许放弃系统默认终端也不失为一种选择。
 
-Windows 终端替代品我推荐 [Cmder](http://cmder.net/)
+Windows 终端替代品推荐 [Cmder](http://cmder.net/)。
 
-Cmder 基于强大的 [Conemu](https://conemu.github.io/)，并在其上默认配置了 Monokai 显示样式，并利用了 [Git for windows](http://gitforwindows.org/) 引入了 git 和 *NIX bash 命令能力，功能强大且简单方便，默认显示字体就比较美观，设置其他字体也很方便。
+Cmder 基于强大的 [Conemu](https://conemu.github.io/)，并在其上默认配置了 Monokai 显示样式，并利用了 [Git for windows](http://gitforwindows.org/) 引入了 Git 和 *NIX Bash 命令能力，功能强大且简单方便，默认显示字体就比较美观，设置其他字体也很方便。
 
 如果你喜欢，甚至可以拦截默认终端调用，将 Cmder 作为默认终端使用。
 
 ![cmder as default term](cmder-default-term.PNG)
+
+具体配置界面比较明了，就不多作解释了，大家可以自行下载尝试。
 
 ## 其他方法
 
