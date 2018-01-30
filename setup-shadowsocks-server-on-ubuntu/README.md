@@ -88,7 +88,14 @@ usermod -G adm,cdrom,sudo,dip,plugdev -a sam    # 为用户 sam 指定管理员�
 + 如需修改 `openssh-server` 配置，如端口号、是否允许 root 远程登录等，可以编辑相关配置文件
   ```shell
   sudo vi /etc/ssh/sshd_config
+  # 修改 ssh 默认监听端口（注意在 aliyun 安全组也增加对应规则）
+  # Port 26022
+  # 禁止 root 用户远程 ssh 登录
+  # PermitRootLogin no
+  # 仅允许 ssh 协议版本 2
+  # Protocol 2
   ```
+
   修改配置后需要重启服务以使新配置生效
   ```shell
   sudo service ssh restart
@@ -134,14 +141,14 @@ usermod -G adm,cdrom,sudo,dip,plugdev -a sam    # 为用户 sam 指定管理员�
 
 为加快速度，我们可以用系统浏览器或其他下载工具预先下载好 `https://bootstrap.pypa.io/get-pip.py`，然后利用 `Git Bash` 中的 `sftp` 工具上传到 Ubuntu Server 中。
 
-  ```shell
-  sftp sam@node1    # sftp 以用户 sam 连接到远程主机 node1，下面的命令是在 `sftp>`提示符下完成的。
-  ls    # 列出远程主机 node1 上的远端目录下的文件，检查是否有重名文件。默认连接的远端目录是用户 sam 的主目录，也即 /home/sam
-  !cd /d/download    # 将本地目录设置到 get-pip.py 所在目录，这里假定 get-pip.py 被下载到 Win10 的 d:\download 目录下。
-  !ls    # 列出本地目录下的文件，检查  get-pip.py 是否存在。
-  put get-pip.py    # 将本地目录下的 get-pip.py 上传到远端目录。
-  bye    # 退出 sftp
-  ```
+```shell
+sftp sam@node1    # sftp 以用户 sam 连接到远程主机 node1，下面的命令是在 `sftp>`提示符下完成的。
+ls    # 列出远程主机 node1 上的远端目录下的文件，检查是否有重名文件。默认连接的远端目录是用户 sam 的主目录，也即 /home/sam
+!cd /d/download    # 将本地目录设置到 get-pip.py 所在目录，这里假定 get-pip.py 被下载到 Win10 的 d:\download 目录下。
+!ls    # 列出本地目录下的文件，检查  get-pip.py 是否存在。
+put get-pip.py    # 将本地目录下的 get-pip.py 上传到远端目录。
+bye    # 退出 sftp
+```
 
 执行下述命令安装 python3 的 pip。
 
@@ -168,7 +175,7 @@ index-url=https://mirrors.aliyun.com/pypi/simple/
 trusted-host=mirrors.aliyun.com
 ```
 
-## 安装和配置 Shadowsocks Server
+## 版本一：shadowsocks (python)
 
 安装加密算法包，Shadowsocks Server 推荐的加密算法 `aes-256-cfb` 需要使用它。
 
@@ -193,22 +200,40 @@ sudo vi /etc/shadowsocks/config.json
 ```json
 {
     "server":"my_server_ip",
-    "server_port":8388,
+    "server_port":26685,
     "local_address": "127.0.0.1",
     "local_port":1080,
     "password":"mypassword",
     "timeout":300,
     "method":"aes-256-cfb",
     "fast_open":false,
-    "workers":10
+    "workers":3
 }
 ```
 
 ### 配置防火墙
 
+检查当前防火墙规则：
+
 ```shell
-sudo iptables -I INPUT -p tcp --dport 8388 -j ACCEPT
+sudo iptables -L -n
+
+# 如果显示结果如下，则意味着没有启用防火墙
+# Chain INPUT (policy ACCEPT)
+# target       prot opt source                 destination
+# Chain FORWARD (policy ACCEPT)
+# target       prot opt source                 destination
+# Chain OUTPUT (policy ACCEPT)
+# target       prot opt source                 destination
 ```
+
+如果启用了 Linux 防火墙，需要增加通过规则：
+
+```shell
+sudo iptables -I INPUT -p tcp --dport 26685 -j ACCEPT
+```
+
+注意，如果使用了 aliyun 服务器，还需要在其管理控制台增加相应安全组规则。
 
 ### 管理 Shadowsocks Server
 
@@ -266,6 +291,144 @@ sudo vi /etc/rc.local
 ll /etc/rc.local    # 检查
 sudo chmod -c +x /etc/rc.local
 ```
+
+## 版本二：shadowsocks-libev
+
+安装
+
+```shell
+# For Ubuntu 16.10 or higher
+sudo apt update
+sudo apt install shadowsocks-libev
+
+# For Ubuntu 14.04 and 16.04 users, please install from PPA:
+sudo apt-get install software-properties-common -y
+sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev -y
+sudo apt-get update
+sudo apt install shadowsocks-libev
+```
+
+修改配置文件
+
+```shell
+# Edit the configuration file
+sudo vim /etc/shadowsocks-libev/config.json
+```
+
+配置文件参考如下。
+
+```json
+{
+    "server":"my_server_ip",
+    "server_port":26685,
+    "local_address": "127.0.0.1",
+    "local_port":1080,
+    "password":"mypassword",
+    "timeout":60,
+    "method":"chacha20-ietf-poly1305",
+    "fast_open":false
+}
+
+启动
+
+```shell
+# Start the process
+sudo ss-server -c /etc/shadowsocks-libev/config.json -v
+
+# Start the service
+sudo systemctl start shadowsocks-libev      # for systemd
+```
+
+设置随系统启动
+
+```shell
+sudo systemctl enable shadowsocks-libev
+```
+
+## 不同版本的功能比较
+
+### Servers
+
+| [Features]       | [Python] | [libev] | [Go] |
+| ---------------- | -------- | ------- | ---- |
+| Fast Open        | Y        | Y       | N    |
+| Multiple Users   | Y        | Y       | Y    |
+| Management API   | Y        | Y       | N    |
+| Workers          | Y        | N       | N    |
+| Graceful Restart | Y        | N       | N    |
+| ss-redir         | N        | Y       | N    |
+| ss-tunnel        | N        | Y       | N    |
+| UDP Relay        | Y        | Y       | N    |
+| OTA              | Y        | Y       | Y    |
+
+### Clients
+
+| [Features]         | [Windows] | [ShadowsocksX] | [Qt5] | [Android] | [iOS App Store] | [iOS Cydia] |
+| ------------------ | --------- | -------------- | ----- | --------- | --------------- | ----------- |
+| System Proxy       | Y         | Y              | N     | Y         | N               | Y           |
+| CHNRoutes          | Y         | Y              | N     | Y         | Y               | Y           |
+| PAC Configuration  | Y         | Y              | N     | N         | N               | N           |
+| Profile Switching  | Y         | Y              | Y     | Y         | N               | Y           |
+| QR Code Scan       | Y         | Y              | Y     | Y         | Y               | Y           |
+| QR Code Generation | Y         | Y              | Y     | Y         | N               | Y           |
+
+## 使用混淆插件
+
+### simple-obfs
+
+插件地址：[https://github.com/shadowsocks/simple-obfs](https://github.com/shadowsocks/simple-obfs)
+
+不建议使用这个混淆器，功能比较简单，性能不好。建议考虑 kcptun。
+
+#### 服务端插件
+
+根据官方描述进行编译安装。
+
+```shell
+cd ~
+sudo apt-get update
+
+# Debian / Ubuntu
+sudo apt-get install --no-install-recommends build-essential autoconf libtool libssl-dev libpcre3-dev libev-dev asciidoc xmlto automake
+
+git clone https://github.com/shadowsocks/simple-obfs.git
+cd simple-obfs
+git submodule update --init --recursive
+./autogen.sh
+./configure && make
+sudo make install
+```
+
+安装后，会产生两个程序： `/usr/local/bin/obfs-server` 和 `/usr/local/bin/obfs-local`。
+
+修改 ss-server 的配置文件，增加插件配置节：
+
+```json
+{
+    "plugin":"obfs-server",
+    "plugin-opts":"obfs=http"
+}
+```
+
+重启服务。
+
+```shell
+ssserver -c /etc/shadowsocks/config.json -d restart
+```
+
+#### 客户端插件
+
+Windows 下的 Shadowsocks-windows 客户端：
+
+下载 https://github.com/shadowsocks/simple-obfs/releases 发布文件 obfs-local.zip
+
+将压缩包中的文件（如 obfs-local.exe 等）解压到 Shadowsocks.exe 所在目录
+
+重新运行 Shadowsocks，指定插件配置。
+
+Android 下：
+
+下载 https://github.com/shadowsocks/simple-obfs-android 发布文件手动安装，或者再 Google Play 安装。
 
 ### 优化（未确认）
 
