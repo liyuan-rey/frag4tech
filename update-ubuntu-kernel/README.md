@@ -102,3 +102,7 @@ sudo apt-get autoremove
 # 重建引导
 sudo update-grub2
 ```
+
+## 参考文章
+
+https://askubuntu.com/questions/119080/how-to-update-kernel-to-the-latest-mainline-version-without-any-distro-upgrade
