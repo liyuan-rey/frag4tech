@@ -122,3 +122,47 @@ usermod -G adm,cdrom,sudo,dip,plugdev -a sam    # 为用户 sam 指定管理员�
   ```shell
   ssh sam@node1
   ```
+
+### SSH 远程常见情况处理
+
+SSH 远程后，有时网络不稳定失去连接，重连后就会连接到新的 pts 伪终端，比如：
+
+```shell
+# 列出所有 pts 伪终端
+ls /dev/pts
+#> 0  1  2  ptmx
+
+# 查看用户和终端使用情况
+who
+#> sam      pts/0        2018-03-07 09:47 (183.95.49.193)
+#> sam      pts/1        2018-03-07 11:18 (183.95.49.193)
+#> sam      pts/2        2018-03-07 11:26 (183.95.49.193)
+
+w
+#>  11:29:24 up 35 days, 15:46,  3 users,  load average: 0.00, 0.00, 0.00
+#> USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+#> sam      pts/0    183.95.49.193    09:47    1:41m  0.05s  0.00s sshd: sam [priv]
+#> sam      pts/1    183.95.49.193    11:18    7:58   0.01s  0.01s -bash
+#> sam      pts/2    183.95.49.193    11:26    1.00s  0.03s  0.00s w
+
+# 查看当前 pts
+tty
+#> /dev/pts/2
+
+# 查看其他伪终端 pts/1 上执行的进程
+ps -t /dev/pts/1
+#>   PID TTY          TIME CMD
+#> 30274 pts/1    00:00:00 bash
+#> 30282 pts/1    00:00:00 sudo
+#> 30283 pts/1    00:00:00 nano
+
+# 结束 pts/1 上执行的进程，如果结束的是伪终端 shell（此为 bash） 则伪终端就会退出
+kill -9 30283 # nano
+kill -9 30274 # bash
+ls /dev/pts
+#> 0  2  ptmx
+
+# 切换伪终端，有人说用 sudo chvt 0，但我没尝试成功
+sudo chvt 0
+
+```
