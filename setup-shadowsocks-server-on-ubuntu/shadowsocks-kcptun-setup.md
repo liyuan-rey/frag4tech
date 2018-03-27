@@ -45,20 +45,13 @@ touch /etc/kcptun/config.json
     "key": "test",
     "crypt": "salsa20",
     "mode": "fast2",
-    "mtu": 1350,
-    "sndwnd": 1024,
-    "rcvwnd": 1024,
-    "datashard": 70,
-    "parityshard": 30,
-    "dscp": 46,
-    "nocomp": false,
-    "acknodelay": false,
-    "nodelay": 0,
-    "interval": 40,
-    "resend": 0,
-    "nc": 0,
-    "sockbuf": 4194304,
-    "keepalive": 10
+    "mtu": 1400,
+    "sndwnd": 2048,
+    "rcvwnd": 2048,
+    "datashard": 10,
+    "parityshard": 3,
+    "dscp": 0,
+    "nocomp": false
 }
 ```
 
@@ -101,9 +94,9 @@ echo "sh /usr/local/bin/kcptun_start.sh" >> /etc/rc.local
 
 在 https://github.com/xtaci/kcptun/releases 下载 windows x64 的 kcptun 程序包，如 https://github.com/xtaci/kcptun/releases/download/v20180305/kcptun-windows-amd64-20180305.tar.gz
 
-解压后有两个文件 `server_windows_amd64.exe` 和 `client_windows_amd64.exe`，我们只需要 `client_windows_amd64.exe`。
+解压后有两个文件 `server_windows_amd64.exe` 和 `client_windows_amd64.exe`，我们只需要客户端程序 `client_windows_amd64.exe`。
 
-将 `client_windows_amd64.exe` 解压到 `%APPDATA%/kcptun/` 目录下。为方便识别，这里改名为 `kcptun_client.exe`。
+将 `client_windows_amd64.exe` 解压到 `%APPDATA%/kcptun/` 目录下。
 
 在 `%APPDATA%/kcptun/config.json` 创建启动配置文件，内容如下：
 
@@ -114,22 +107,15 @@ echo "sh /usr/local/bin/kcptun_start.sh" >> /etc/rc.local
     "key": "test",
     "crypt": "salsa20",
     "mode": "fast2",
-    "conn": 1,
-    "autoexpire": 60,
-    "mtu": 1350,
-    "sndwnd": 128,
-    "rcvwnd": 1024,
-    "datashard": 70,
-    "parityshard": 30,
+    "conn": 5,
+    "autoexpire": 0,
+    "mtu": 1400,
+    "sndwnd": 256,
+    "rcvwnd": 2048,
+    "datashard": 10,
+    "parityshard": 3,
     "dscp": 46,
-    "nocomp": false,
-    "acknodelay": false,
-    "nodelay": 0,
-    "interval": 40,
-    "resend": 0,
-    "nc": 0,
-    "sockbuf": 4194304,
-    "keepalive": 10
+    "nocomp": false
 }
 ```
 
@@ -141,30 +127,10 @@ echo "sh /usr/local/bin/kcptun_start.sh" >> /etc/rc.local
 + parityshard
 + nocomp
 
-`kcptun_client.exe` 是控制台程序，我们创建 VBScript 脚本来在后台执行它。
+### kcptun Windows GUI
 
-```vb
-Dim RunKcptun
-Set fso = CreateObject("Scripting.FileSystemObject")
-Set WshShell = WScript.CreateObject("WScript.Shell")
-'获取文件路径
-currentPath = fso.GetFile(Wscript.ScriptFullName).ParentFolder.Path & "\"
-'配置文件路径
-configFile = currentPath & "config.json"
-'日志文件
-logFile = currentPath & "kcptun.log"
-'软件运行参数
-exeConfig = currentPath & "kcptun_client.exe -c " & configFile
-'拼接命令行
-cmdLine = "cmd /c " & exeConfig & " > " & logFile & " 2>&1"
-'启动软件
-WshShell.Run cmdLine, 0, False
-'等待1秒
-'WScript.Sleep 1000
-'打印运行命令
-'Wscript.echo cmdLine
-Set WshShell = Nothing
-Set fso = Nothing
-'退出脚本
-WScript.quit
-```
+`client_windows_amd64.exe` 是控制台程序，建议使用 [kcptun-gui](https://github.com/GangZhuo/kcptun-gui-windows) 来简化使用，感谢 [Gang Zhuo](https://github.com/GangZhuo)。
+
+## 其他参考
+
+https://blog.kuoruan.com/102.html
