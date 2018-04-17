@@ -26,14 +26,14 @@ sudo vim /etc/shadowsocks-libev/config.json
 
 ```json
 {
-    "server":"my_server_ip",
-    "server_port":26685,
+    "server": "my_server_ip",
+    "server_port": 26685,
     "local_address": "127.0.0.1",
-    "local_port":1080,
-    "password":"mypassword",
-    "timeout":60,
-    "method":"chacha20-ietf-poly1305",
-    "fast_open":false
+    "local_port": 1080,
+    "password": "mypassword",
+    "timeout": 60,
+    "method": "chacha20-ietf-poly1305",
+    "fast_open": false
 }
 ```
 
@@ -41,7 +41,7 @@ sudo vim /etc/shadowsocks-libev/config.json
 
 ```shell
 # 进程方式启动
-sudo ss-server -c /etc/shadowsocks-libev/config.json -v
+sudo ss-server -c /etc/shadowsocks-libev/config.json -u
 
 # systemd 服务方式启动
 sudo systemctl start shadowsocks-libev
