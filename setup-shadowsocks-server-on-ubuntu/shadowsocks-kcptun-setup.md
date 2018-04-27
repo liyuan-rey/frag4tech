@@ -1,6 +1,6 @@
 # 混淆和加速程序 kcptun 安装
 
-[kcptun 主页](ttps://github.com/xtaci/kcptun)
+[kcptun 主页](https://github.com/xtaci/kcptun)
 
 工作示意图：
 
@@ -40,18 +40,18 @@ touch /etc/kcptun/config.json
 
 ```json
 {
-    "listen": ":29900",
-    "target": "127.0.0.1:8388",
-    "key": "test",
-    "crypt": "salsa20",
-    "mode": "fast2",
-    "mtu": 1400,
-    "sndwnd": 2048,
-    "rcvwnd": 2048,
-    "datashard": 10,
-    "parityshard": 3,
-    "dscp": 0,
-    "nocomp": false
+  "listen": ":29900",
+  "target": "127.0.0.1:8388",
+  "key": "test",
+  "crypt": "salsa20",
+  "mode": "fast2",
+  "mtu": 1400,
+  "sndwnd": 2048,
+  "rcvwnd": 2048,
+  "datashard": 10,
+  "parityshard": 3,
+  "dscp": 0,
+  "nocomp": false
 }
 ```
 
@@ -102,30 +102,30 @@ echo "sh /usr/local/bin/kcptun_start.sh" >> /etc/rc.local
 
 ```json
 {
-    "localaddr": ":12948",
-    "remoteaddr": "10.10.10.10:29900",
-    "key": "test",
-    "crypt": "salsa20",
-    "mode": "fast2",
-    "conn": 5,
-    "autoexpire": 0,
-    "mtu": 1400,
-    "sndwnd": 256,
-    "rcvwnd": 2048,
-    "datashard": 10,
-    "parityshard": 3,
-    "dscp": 46,
-    "nocomp": false
+  "localaddr": ":12948",
+  "remoteaddr": "10.10.10.10:29900",
+  "key": "test",
+  "crypt": "salsa20",
+  "mode": "fast2",
+  "conn": 5,
+  "autoexpire": 0,
+  "mtu": 1400,
+  "sndwnd": 256,
+  "rcvwnd": 2048,
+  "datashard": 10,
+  "parityshard": 3,
+  "dscp": 46,
+  "nocomp": false
 }
 ```
 
 注意，下列参数在服务端和客户端配置中必须保持一致：
 
-+ key
-+ crypt
-+ datashard
-+ parityshard
-+ nocomp
+* key
+* crypt
+* datashard
+* parityshard
+* nocomp
 
 ### kcptun Windows GUI
 
