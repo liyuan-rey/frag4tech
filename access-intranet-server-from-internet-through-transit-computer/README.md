@@ -25,8 +25,6 @@
 
 这里介绍的方法是利用 SSH 技术（主要使用 OpenSSH 软件）来达成目标。
 
-因为搭建环境的关键是 `中转机` 所以我们主要描述中转机上的部署、配置和使用。我们假定 `远控机` 和 `内网服务器` 都已分别安装好 SSH 客户端软件和 SSH 服务。
-
 大致有两种方案：
 
 - 远控机(互联网) -> WIFI 端口映射 -> 中转机(内外网) -> 服务器(内网)
@@ -34,7 +32,9 @@
 
 ## 中转机的 OpenSSH 安装和设置
 
-### 安装
+因为搭建环境的关键是 `中转机`，所以我们主要描述中转机上的部署、配置和使用。我们假定 `远控机` 和 `内网服务器` 都已分别安装好 SSH 客户端软件和 SSH 服务。
+
+### 安装 OpenSSH Server 和 Client
 
 Windows 10 (1803) 及以上版本中内置了 OpenSSH Server 和 Client。可以通过 “设置” -> “应用和功能” -> “可选功能” -> “添加功能” 来进行安装。安装后的效果如下图：
 
@@ -85,9 +85,9 @@ https://github.com/PowerShell/Win32-OpenSSH/wiki/Security-protection-of-various-
 
 ### OpenSSH Client
 
-Win10 内置的 OpenSSH Client 不需要额外配置就可以直接使用。
+Win10 内置的 OpenSSH Client 安装后不需要额外配置就可以直接使用。
 
-### 简单使用
+### 安装后的简单验证
 
 现在可以通过本机的 OpenSSH Client 访问本机 OpenSSH Server 来简单验证一下功能是否正常。
 
@@ -103,7 +103,7 @@ ssh w@localhost
 
 注意，连接 Win10 内置的 OpenSSH Server 后，得到的是 Windows CMD 环境，只能运行 `dir` 等内置命令以及 `PATH` 环境变量涵盖的路径下的程序。
 
-幸运的是，再前面的安装过程中，OpenSSH 程序路径已经自动设置到 `PATH` 中了，所以我们可以继续利用 SSH 访问内网机器。
+在前面的安装过程中，OpenSSH 程序路径已经自动设置到 `PATH` 中了，所以我们直接利用 SSH 访问内网机器。
 
 ```shell
 # 查看 PATH 环境变量
