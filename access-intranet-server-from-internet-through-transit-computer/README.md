@@ -183,7 +183,7 @@ ssh -o ServerAliveInterval=60 -J serveo.net username@custom-subdomain
 正常连接后会提示输入 username 用户的密码，正确验证后即可进入 `中转机` 的 OpenSSH Server 提供的 SSH 服务终端控制台。
 此后再继续运行类似 `ssh username@internal-server` 命令就可像在 `中转机` 上一样连接到内网服务器。
 
-除了 SSH 转发，通过 Serveo 还可以建立许多其它类型的转发服务，具体可以参考 http://serveo.net 官网指南。
+除了 SSH 转发，通过 Serveo 还可以建立许多其它类型的转发服务，具体可以参考 https://serveo.net 官网指南。
 
 #### 自建 SSH 转发服务
 
