@@ -1,4 +1,4 @@
-# Oracle Linux，数据库，WebLogic Server 安装实战
+# Oracle Linux，Database，WebLogic Server，PSRM 安装实战
 
 ## 版本信息
 
@@ -14,9 +14,11 @@
 
 | 软件                       | 版本       |
 | -------------------------- | ---------- |
-| Oracle Linux 7             | 7.7        |
-| Oracle Database 12c        | 12.2.0.1.0 |
-| Oracle WebLogic Server 12c | ...        |
+| Oracle Linux 7 x64         | 7.6        |
+| Oracle Database 12c x64    | 12.2.0.1.0 |
+| Oracle WebLogic Server 12c | 12.2.1.3.0 |
+| OUAF                       | 4.3.0.4.0  |
+| PSRM                       | 2.5.0.1.0  |
 
 ## 安装 Oracle Linux
 
@@ -377,6 +379,7 @@ EM Express 登录页面，填写用户名，密码，选中 as sysdba，留空 C
 
 可以参考：https://blog.csdn.net/acmman/article/details/70093877，但因为版本不同，启动安装程序的方式不同。
 
+
 下载 "Generic Installer (800 MB)" 解压缩。
 
 运行解压后的 jar 包，启动安装程序。
@@ -388,18 +391,33 @@ java -jar fmw_12.2.1.3.0_wls.jar
 
 安装很简单，可以使用默认选项，选择只装 WebLogic 不装 Coherence，选择安装所有 features。
 
-安装后选择自动运行配置工具，创建新 domain。后面用户名、密码（至少8位包含数字）使用 weblogic/weblogic6。
-Domain Mode 选择 Development。JDK会自动检测到 JAVA_HOME 指定的 JDK，我这里用的 Oracle JDK，而不是 Oracle OpenJDK。
+安装后选择自动运行配置工具：
 
-一路使用默认选项进行安装，最后提示管理网页路径为：http://ol7gui:7001/console
+- 创建新 domain。
+- domain 安装位置：/home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain
+- 使用产品模板创建 domain，选择所有模板，选择所有 checkbox
+- 配置管理员账户名称、口令：weblogic/weblogic6。后面 PSRM 的 OUAF 安装时会用到，查找本文 `WLS_WEB_WLSYSUSER` 和 `WLS_WEB_WLSYSPASS`。
+- Domain Mode 选择 Development。JDK 路径部分会自动检测到 JAVA_HOME 指定的 JDK。我这里用的 Oracle JDK，而不是 Oracle OpenJDK。
+- 高级配置选择全部 5 项 checkbox。
+- 管理服务器名称：AdminServer，监听地址：All Local Addresses，监听端口：7001。选择不启用 SSL。
+- 节点管理器类型：按域的默认位置，节点管理器身份证明用户名、口令未创建新的，而是用之前的管理员账户名和口令：weblogic/weblogic6
+- 受管服务器、集群配置页都用默认为空
+- Coherence 集群用默认：defaultCoherenceCluster，端口 0
+- 计算机配置页为空
+- 部署定位、服务定位配置页用默认
+- JMS 文件存储配置页用默认
 
-安装完成后，找到安装目录 “/home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain”，运行其中的启动脚本。
+然后下一步，然后创建。创建操作完成后提示管理网页路径为：http://ol7gui:7001/console
+
+> 注意后面安装 PSRM 的 OUAF 时的 `WEB_SERVER_HOME` 路径，指的是 “/home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home/wlserver”，而不是 domain 位置。
+
+安装完成后，找到 domain 安装位置 “/home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain”，运行其中的启动脚本。
 
 ```shell
 ./startWebLogic.sh
 ```
 
-用浏览器打开 “http://ol7gui:7001/console” 可以看到登录界面，用 weblogic 用户登录后可以看到管理界面。
+用浏览器打开 “http://ol7gui:7001/console” 可以看到登录界面，用 `weblogic` 用户登录后可以看到管理界面。
 
 ## 安装 PSRM
 
@@ -427,8 +445,8 @@ PSRM 软件自身需要安装的内容：
 
 | Description                                                   | Default Value | Customer Defined Value |
 | ------------------------------------------------------------- | ------------- | ---------------------- |
-| Oracle Public Sector Revenue Management Administrator User ID | cissys        |                        |
-| Oracle Public Sector Revenue Management User Group            | cisusr        |                        |
+| Oracle Public Sector Revenue Management Administrator User ID | cissys        | oracle                 |
+| Oracle Public Sector Revenue Management User Group            | cisusr        | cisusr                 |
 
 我们搭建单台开发环境，不需要这么复杂，所以直接使用了安装 Oracle 数据库时的 `oracle` 用户。
 
@@ -455,6 +473,8 @@ echo $SHELL
 
 ### 安装 Oracle Client
 
+> 注意：即便是在同一台机器上安装了 Oracle Database，也需要安装 Oracle Database Client。后面 PSRM 安装时需要 Client 路径里的 Perl。
+
 解压缩 Client 安装包，并执行安装程序。
 
 ```shell
@@ -462,9 +482,9 @@ unzip linuxx64_12201_client.zip
 ./client/runInstaller
 ```
 
-选择只安装 “InstantClient (260.0MB)”。
+需要选择安装完整版 “”，只装 Instant Client 时没有所需的 PERL 版本环境。
 
-下一步选择安装路径时，因为已经安装了 Oracle Database，所以默认路径 “/home/oracle/app/oracle/product/12.2.0/dbhome_1” 提示冲突不能安装，改到 “/home/oracle/app/oracle/product/12.2.0/clienthome_1” 就可以了。
+> 下一步选择安装路径时，因为已经安装了 Oracle Database，所以默认路径 “/home/oracle/app/oracle/product/12.2.0/dbhome_1” 提示冲突不能安装，改到 “/home/oracle/app/oracle/product/12.2.0/clienthome_1” 就可以了。
 
 下一步直到安装成功。
 
@@ -473,7 +493,23 @@ unzip linuxx64_12201_client.zip
 ```shell
 export ORACLE_CLIENT_HOME=$ORACLE_BASE/product/12.2.0/clienthome_1
 #export PATH=${ORACLE_CLIENT_HOME}/perl/bin:${PATH}
-#但我发现只装 InstantClient 时没有 “${ORACLE_CLIENT_HOME}/perl/bin” 这个目录，所以上一行注释了
+```
+
+后面安装 PSRM 的 OUAF 时，无论系统自带的 perl 还是 oracle client 安装后附带的 perl，本地 PERL_LIB 中都没有 `CGI.pm` 这个模块，导致安装失败。
+
+这里手动装一下 `CGI.pm` 模块。
+
+```shell
+export PERL_HOME=${ORACLE_CLIENT_HOME}/perl
+export PATH=${PERL_HOME}/bin:${PATH}
+export PERL5LIB=$PERL_HOME/lib:$PERL_HOME/lib/site_perl:${INSTALLDIR}/data/bin/perllib
+
+su # 切换到 root 身份，运行后续命令
+
+perl -e shell -MCPAN
+
+## 然后在 cpan[1]> 提示符后输入下面命令
+install CGI
 ```
 
 ### 安装 Hibernate
@@ -514,7 +550,7 @@ vim ~/.bash_profile
 添加这些命令在文件末尾。
 
 ```shell
-export HIBERNATE_JAR_DIR=~/lib/hibernate/mixed-for-psrm-2.5.0.1
+export HIBERNATE_JAR_DIR=/home/oracle/lib/hibernate/mixed-for-psrm-2.5.0.1
 ```
 
 保存并退出编辑器。
@@ -586,10 +622,19 @@ GRANT CIS_READ TO CISREAD;
 GRANT CONNECT TO CISREAD;
 ```
 
+### 初始化 PSRM 数据库
+
 解压缩 PSRM 2.5.0.1 版本安装文件。
 
 ```shell
 unzip Install-upgrade.zip
+
+###
+# 注意现在拿到的这个 zip 不是官方安装包，可能是某人自己合并了一下 Linux 和 Windows 安装文件。
+# 包里有一些错误，比如 OUAF 数据库补丁脚本 ouafDatabasePatch.sh 未设置可执行权限等（但我们后面也没用），
+# 需要做下面的修复动作，才能在 Linux 上正常执行 PSRM 数据库创建。
+
+mv ./Install-upgrade/PSRM/V2.5.0.1.0/Install-Upgrade/OraDelUpg.INP ./Install-upgrade/PSRM/V2.5.0.1.0/Install-Upgrade/OraDelUpg.inp
 ```
 
 解压后可以看到 “Install-upgrade” 文件夹，其内部含有 “FW” “PSRM” 等两个子文件夹。其中 “FW” 是 OUAF 数据库安装文件，“PSRM” 是 PSRM 数据库安装文件。
@@ -612,37 +657,74 @@ OUAF 数据库安装过程中需要下列信息：
 |     Enter the database role with read-only privileges to Database Schema: | CIS_READ               |
 | Enter the name of the target Schema where you want to install or upgrade: | CISADM                 |
 
-进入安装程序目录，开始创建数据库。
+注意，具有读写权限的 `CISUSER` 用户，在后面安装 PSRM/OUAF 应用时会用到，可以用关键字 `WEB_WLSYSUSER` 搜索本文查看。
+
+进入 FW 安装程序目录，开始创建 OUAF 数据库。
+
+> 注意：创建开始前需要关闭其他数据库连接，比如 sqlplus 的连接。
 
 ```shell
 cd ./Install-upgrade/FW/V4.3.0.4.0/Install-Upgrade
 
 # 以交互方式运行安装程序，根据程序提示按上表输入对应值。
+# TODO: 这里需要加 ${CLASSPATH}，更准确的方式是写 shell 脚本把 jarfiles 中的 jar 都加入 -cp 参数
+# TODO: 不确定是否需要加 -l 1,2 参数
 ${JAVA_HOME}/bin/java -Xmx1500M \
     -cp ${PWD}/../jarfiles/*:${CLASSPATH} \
     com.oracle.ouaf.oem.install.OraDBI
 
-###
-## 官方文档有非交互方式如下，但我没试成功，有兴趣可以自己试试
-#${JAVA_HOME}/bin/java -Xmx1500M \
-#    -cp ${PWD}/../jarfiles/*:${CLASSPATH} \
-#    com.oracle.ouaf.oem.install.OraDBI \
-#    -d jdbc:oracle:thin:@ol7gui:1521/orcl,CISADM,CISADM,CISUSER,CISREAD,CIS_USER,CIS_READ,CISADM \
-#    -l 1,2 -j ${JAVA_HOME}
+# 还有非交互式方式如下，我比较喜欢这种
+${JAVA_HOME}/bin/java -Xmx1500M \
+    -cp ${PWD}/../jarfiles/*:${CLASSPATH} \
+    com.oracle.ouaf.oem.install.OraDBI \
+    -d ol7gui:1521/orcl,CISADM,CISADM,CISUSER,CISREAD,CIS_USER,CIS_READ,CISADM \
+    -j ${JAVA_HOME} \
+    -l 1,2
+```
+
+> 下面是 com.oracle.ouaf.oem.install.OraDBI 程序的使用说明，供参考。
+
+```plain
+usage: java OraDBI [-d <arg>] [-f <arg>] [-h] [-j <arg>] [-l <arg>] [-q]
+OraDBI Help
+   -d <arg>     db connection as:
+                db_host:db_port/db_service,db_user,db_pwd,rw_user,r_user,rw_role,r_role,target_schem
+                a
+   -f <arg>     File to get parameters from
+   -h           Help
+   -j <arg>     Java home directory
+   -l <arg>     NLS language
+   -q           Silent mode
+End of OraDBI Help
 ```
 
 接下来为 OUAF 数据库打补丁。
+
+> 官方文档中说明的利用 ouafDatabasePatch.sh 脚本运行补丁程序，但其实并不方便也不明晰，
+> 所以下面没有用 ouafDatabasePatch.sh 脚本，是自己运行的 com.oracle.ouaf.database.patch.OUAFPatch 程序。
 
 ```shell
 cd ./Install-upgrade/FW/V4.3.0.4.0-HotFixes/Oracle/CDXPatch
 
 ${JAVA_HOME}/bin/java \
-    -cp ${PWD}/db_patch_standalone/config:${PWD}/db_patch_standalone/lib/*:${CLASSPATH} \
-    com.oracle.ouaf.database.patch.OUAFPatch
+    -cp ${PWD}/db_patch_standalone/config:${PWD}/db_patch_standalone/lib/* \
+    com.oracle.ouaf.database.patch.OUAFPatch \
+    -t O \
+    -d CISADM,ol7gui:1521:orcl \
+    -p ${PWD}/CDXPatch.ini \
+    -u CISUSER,CISREAD \
+    -o CIS_USER,CIS_READ \
+    -r -i \
+    -l ${PWD}/logcdxpatch.txt
 ```
 
+> 特别注意：
+> 这个 com.oracle.ouaf.database.patch.OUAFPatch 在我这运行有问题，有些交互式提示看不见，需要输入指令的时候就会卡住。
+> 上述命令执行后，首先会询问 CISADM 的密码，然后要注意观察光标是否还在闪动，不闪动时就是在提示是否要做 “Generate Security”
+> 安全性设置，此时输入 y 回车就好，就会继续执行完毕
+> 下面是命令参数说明，供参考。参数说明好像有错误，比如 -o 的字符串顺序错了、-l 似乎应该是 lang 语言而不是日志... 所以应该以上面命令为准。
+
 ```plain
-[oracle@ol7gui CDXPatch]$ ./ouafDatabasePatch.sh -h
 usage: java -cp OUAFPatch.jar [-c] [-d <arg>] [-h] [-i] [-l <arg>] [-n] [-o
        <arg>] [-p <arg>] [-q] [-r] [-s] [-t <arg>] [-u <arg>] [-v]
 DB Patch Help
@@ -668,4 +750,229 @@ DB Patch Help
    -v           Print version information.
 End of DB Patch Help
 
+```
+
+然后进入 PSRM 安装程序目录，开始创建 PSRM 数据库。
+
+> 注意：创建开始前需要关闭其他数据库连接，比如 sqlplus 的连接。
+
+```shell
+cd ./Install-upgrade/PSRM/V2.5.0.1.0/Install-Upgrade
+
+# 以交互方式运行安装程序，根据程序提示按上表输入对应值。
+${JAVA_HOME}/bin/java -Xmx1500M \
+    -cp ${PWD}/../jarfiles/*:${CLASSPATH} \
+    com.oracle.ouaf.oem.install.OraDBI
+
+###
+## 非交互方式如下，命令行需要
+${JAVA_HOME}/bin/java -Xmx1500M \
+   -cp ${PWD}/../jarfiles/*:${CLASSPATH} \
+   com.oracle.ouaf.oem.install.OraDBI \
+   -d ol7gui:1521/orcl,CISADM,CISADM,CISUSER,CISREAD,CIS_USER,CIS_READ,CISADM \
+   -j ${JAVA_HOME} \
+   -l 1,2
+```
+
+### 安装 OUAF 应用
+
+运行 OUAF 安装脚本。
+
+> 下述根据脚本提示的配置有些多，不过好消息是，如果在安装配置过程中有中断，是可以重新运行脚本进行安装配置的。
+
+```shell
+mkdir /usr/tmp/ouaf
+cp FW-V4.3.0.4.0-MultiPlatform.jar /usr/tmp/ouaf/
+cd /usr/tmp/ouaf
+
+jar -xvf FW-V4.3.0.4.0-MultiPlatform.jar
+
+cd FW-V4.3.0.4.0-SP4/
+./install.sh
+```
+
+控制台会显示第一轮安装配置清单，选项有 1， 2， 50， P， X 等。
+
+选择 1，根据脚本提示，按下表进行配置。
+
+|                               Menu Option | Name Used in Documentation | Customer Install Value                                                                        |
+| ----------------------------------------: | -------------------------- | --------------------------------------------------------------------------------------------- |
+|                            Environment ID | ENVIRONMENT_ID             | [ 每次运行都会随机生成新的，按 Enter 直接使用默认值，比如 98770140 ]                          |
+|                              Server Roles | SERVER_ROLES               | batch,online                                                                                  |
+|              Oracle Client Home Directory | ORACLE_CLIENT_HOME         | /home/oracle/app/oracle/product/12.2.0/clienthome_1                                           |
+|                   Web Java Home Directory | JAVA_HOME                  | /usr/java/jdk1.8.0_221                                                                        |
+|                   Hibernate JAR Directory | HIBERNATE_JAR_DIR          | /home/oracle/lib/hibernate/mixed-for-psrm-2.5.0.1                                             |
+|                       **ONS JAR Directory | ONS_JAR_DIR                | [ 留空，参考地址：/home/oracle/app/oracle/product/12.2.0/dbhome_1/opmn/lib ]                  |
+|     Web Application Server Home Directory | WEB_SERVER_HOME            | /home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home/wlserver                                |
+| WebLogic Server Thin-Client JAR Directory | WLTHINT3CLIENT_JAR_DIR     | [ 留空，参考地址：/home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home/wlserver/server/lib ] |
+|                      * ADF Home Directory | ADF_HOME                   | [ 按 Enter 直接使用默认值，可以留空 ]                                                         |
+|               OIM OAM Enabled Environment | OPEN_SPML_ENABLED_ENV      | false                                                                                         |
+
+然后选择 2，根据提示按下表配置。
+
+|               Menu Option | Name Used in Documentation | Customer Install Value |
+| ------------------------: | -------------------------- | ---------------------- |
+| Import Keystore Directory | KS_IMPORT_KEYSTORE_FOLDER  | [ 留空 ]               |
+|                Store Type | KS_STORETYPE               | JCEKS                  |
+|                     Alias | KS_ALIAS                   | ouaf.system            |
+|       Alias Key Algorithm | KS_ALIAS_KEYALG            | AES                    |
+|            Alias Key Size | KS_ALIAS_KEYSIZE           | 128                    |
+|                HMAC Alias | KS_HMAC_ALIAS              | ouaf.system.hmac       |
+|                   Padding | KS_PADDING                 | PKCS5Padding           |
+|                      Mode | KS_MODE                    | CBC                    |
+
+选择 50 之前，先启动新的 Console 手动创建一些目录。
+
+先创建目录 “/home/oracle/new-disk-1/ouafhome_1/log”
+
+```shell
+mkdir -p /home/oracle/new-disk-1/ouafhome_1/log
+```
+
+然后选择 50，根据提示按下表配置。
+
+|                            Menu Option | Name Used in Documentation | Customer Install Value                 |
+| -------------------------------------: | -------------------------- | -------------------------------------- |
+|                Environment Mount Point | SPLDIR                     | /home/oracle/new-disk-1/ouafhome_1     |
+|                   Log File Mount Point | SPLDIROUT                  | /home/oracle/new-disk-1/ouafhome_1/log |
+|                       Environment Name | SPLENVIRON                 | ouaf_1 [ 这个比较重要 ]                |
+|            Web Application Server Type | SPLWAS                     | WLS                                    |
+| Installation Application Viewer Module | WEB_ISAPPVIEWER            | true                                   |
+|    Install Demo Generation Cert Script | CERT_INSTALL_SCRIPT        | true                                   |
+|          Install Sample CM Source Code | CM_INSTALL_SAMPLE          | true                                   |
+
+选择 `P`，会看到脚本根据上面的配置信息进行了第一轮处理。
+
+然后会显示第二轮配置清单，选项有 1， 2， 3， 4， 5， 6， 7， P， X 等。
+
+选择 1，根据提示按下表配置。
+
+|             Menu Option | Name Used in Documentation | Customer Install Value      |
+| ----------------------: | -------------------------- | --------------------------- |
+| Environment Description | DESC                       | weblogic psrm 2.5.0.1 No-01 |
+
+选择 2，根据提示按下表配置。
+
+|                 Menu Option | Name Used in Documentation | Customer Install Value |
+| --------------------------: | -------------------------- | ---------------------- |
+|        Business Server Host | BSN_WLHOST                 | ol7gui                 |
+|        WebLogic Server Name | BSN_WLS_SVRNAME            | myserver               |
+| Business Server Application | Name BSN_APP               | SPLService             |
+|       MPL Admin Port number | MPLADMINPORT               | 6502                   |
+|       MPL Automatic Startup | MPLSTART                   | false                  |
+
+选择 3，根据提示按下表配置。
+
+|                               Menu Option | Name Used in Documentation | Customer Install Value                                          |
+| ----------------------------------------: | -------------------------- | --------------------------------------------------------------- |
+|                           Web Server Host | WEB_WLHOST                 | ol7gui                                                          |
+|                  Weblogic SSL Port Number | WEB_WLSSLPORT              | 6501                                                            |
+|              Weblogic Console Port Number | WLS_ADMIN_PORT             | 6500                                                            |
+|        Weblogic Additional Stop Arguments | ADDITIONAL_STOP_WEBLOGIC   | -                                                               |
+|                          Web Context Root | WEB_CONTEXT_ROOT           | ouaf                                                            |
+|                     WebLogic JNDI User ID | WEB_WLSYSUSER              | oracle [ 这里要的是 LDAP 账户，必填所以随便填了个操作系统用户 ] |
+|                    WebLogic JNDI Password | WEB_WLSYSPASS              | oracle                                                          |
+|             WebLogic Admin System User ID | WLS_WEB_WLSYSUSER          | weblogic [ weblogic 安装时的管理员账户 ]                        |
+|            WebLogic Admin System Password | WLS_WEB_WLSYSPASS          | weblogic6                                                       |
+|                      WebLogic Server Name | WEB_WLS_SVRNAME            | myserver                                                        |
+|               Web Server Application Name | WEB_APP                    | SPLWeb                                                          |
+|                Deploy Using Archive Files | WEB_DEPLOY_EAR             | true                                                            |
+|          Deploy Application Viewer Module | WEB_DEPLOY_APPVIEWER       | true                                                            |
+| Enable The Unsecured Health Check Service | WEB_ENABLE_HEALTHCHECK     | false                                                           |
+|                         MDB RunAs User ID | WEB_IWS_MDB_RUNAS_USER     | [ 留空 ]                                                        |
+|                            Super User Ids | WEB_IWS_SUPER_USERS        | SYSUSER ？                                                      |
+
+选择 4，根据提示按下表配置。
+
+|                          Menu Option | Name Used in Documentation | Customer Install Value    |
+| -----------------------------------: | -------------------------- | ------------------------- |
+|  Application Server Database User ID | DBUSER                     | CISADM                    |
+| Application Server Database Password | DBPASS                     | CISADM                    |
+|                 MPL Database User ID | MPL_DBUSER                 | CISADM                    |
+|                MPL Database Password | MPL_DBPASS                 | CISADM                    |
+|                 XAI Database User ID | XAI_DBUSER                 | CISADM                    |
+|                XAI Database Password | XAI_DBPASS                 | CISADM                    |
+|               Batch Database User ID | BATCH_DBUSER               | CISADM                    |
+|              Batch Database Password | BATCH_DBPASS               | CISADM                    |
+|             Web JDBC DataSource Name | JDBC_NAME                  | [ 留空 ]                  |
+|                JDBC Database User ID | DBUSER_WLS                 | [ 留空 ]                  |
+|               JDBC Database Password | DBPASS_WLS                 | [ 留空 ]                  |
+|                        Database Name | DBNAME                     | orcl                      |
+|                      Database Server | DBSERVER                   | ol7gui                    |
+|                        Database Port | DBPORT                     | 1521                      |
+|             ONS Server Configuration | ONSCONFIG                  | [ 留空 ]                  |
+|  Database Override Connection String | DB_OVERRIDE_CONNECTION     | [ 留空 ]                  |
+|             Character Based Database | CHAR_BASED_DB              | false                     |
+|          Oracle Client Character Set | NLS_LANG NLS_LANG          | AMERICAN_AMERICA.AL32UTF8 |
+
+选择 5，根据提示按下表配置。
+
+|                      Menu Option | Name Used in Documentation   | Customer Install Value             |
+| -------------------------------: | ---------------------------- | ---------------------------------- |
+|                   Batch RMI Port | BATCH_RMI_PORT               | 6540                               |
+| RMI Port number for JMX Business | BSN_JMX_RMI_PORT_PERFORMANCE | 6550                               |
+|      RMI Port number for JMX Web | WEB_JMX_RMI_PORT_PERFORMANCE | 6570                               |
+|       JMX Enablement System User | ID BSN_JMX_SYSUSER           | [ 留空 ]                           |
+|   JMX Enablement System Password | BSN_JMX_SYSPASS              | [ 留空 ]                           |
+|           Coherence Cluster Name | COHERENCE_CLUSTER_NAME       | [ 留空 ] ? defaultCoherenceCluster |
+|        Coherence Cluster Address | COHERENCE_CLUSTER_ADDRESS    | [ 留空 ] ? 192.168.126.133         |
+|           Coherence Cluster Port | COHERENCE_CLUSTER_PORT       | [ 留空 ] ? 22580                   |
+|           Coherence Cluster Mode | COHERENCE_CLUSTER_MODE       | dev                                |
+
+选择 6，根据提示按下表配置。
+
+|                 Menu Option | Name Used in Documentation | Customer Install Value |
+| --------------------------: | -------------------------- | ---------------------- |
+|   Certificate Keystore Type | CERT_KS                    | DEMO                   |
+|      Identify Keystore File | CERT_IDENT_KS_FILE         | [ 留空 ]               |
+| Identify Keystore File Type | CERT_IDENT_KS_TYPE         | jks                    |
+|  Identify Keystore Password | CERT_IDENT_KS_PWD          | jks                    |
+|  Identity Private Key Alias | CERT_IDENT_KS_ALIAS        | ouaf_demo_cert         |
+|         Trust Keystore File | CERT_TRUST_KS_FILE         | [ 留空 ]               |
+|    Trust Keystore File Type | CERT_TRUST_KS_TYPE         | jks                    |
+|     Trust Keystore Password | CERT_TRUST_KS_PWD          | jks                    |
+|     Trust Private Key Alias | CERT_TRUST_KS_ALIAS        | ouaf_demo_cert         |
+
+选择 7，根据提示按下表配置。
+
+|                 Menu Option | Name Used in Documentation | Customer Install Value |
+| --------------------------: | -------------------------- | ---------------------- |
+| Import TrustStore Directory | TS_IMPORT_KEYSTORE_FOLDER  | [ 留空 ]               |
+|                  Store Type | TS_STORETYPE               | JCEKS                  |
+|                       Alias | TS_ALIAS                   | ouaf.system            |
+|         Alias Key Algorithm | TS_ALIAS_KEYALG            | AES                    |
+|              Alias Key Size | TS_ALIAS_KEYSIZE           | 128                    |
+|                  HMAC Alias | TS_HMAC_ALIAS              | ouaf.system.hmac       |
+|                     Padding | TS_PADDING                 | PKCS5Padding           |
+|                        Mode | TS_MODE                    | CBC                    |
+
+选择 P，开始安装
+
+如果是第一次安装，安装过程中会提示运行脚本创建 cistab 文件并写入记录。
+
+新建一个控制台，用 root 用户执行。
+
+```shell
+/var/tmp/ouaf/FW-V4.3.0.4.0-SP/cistab_ouaf_1.sh
+```
+
+回到安装脚本运行的控制台，输入 Y 继续。
+
+> 注意，如果在运行 `cistab_ouaf_1.sh` 之后安装过程异常终止了，需要以 root 编辑 `/etc/cistab` 文件，删除其中的 `Environment Name` 如 `ouaf_1` 对应行。
+
+直至最后安装成功，下面是输出结果。
+
+```plain
+...
+190907:191247 <info>  FW installation completed successfully, see the log /home/oracle/new-disk-1/software/FW-V4.3.0.4.0-SP4/install_FW_ouaf_1.log
+Executing: /home/oracle/new-disk-1/ouafhome_1/ouaf_1/bin/splenviron.sh -e ouaf_1
+JAVA_HOME=/usr/java/jdk1.8.0_221
+WL_HOME=/home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home/wlserver
+Version ................ (SPLVERSION) : V4.3.0.4.0
+Database Type ............... (CMPDB) : oracle
+ORACLE_SID ............. (ORACLE_SID) : orcl
+NLS_LANG ................. (NLS_LANG) : AMERICAN_AMERICA.AL32UTF8
+Environment Name ....... (SPLENVIRON) : ouaf_1
+Environment Code Directory (SPLEBASE) : /home/oracle/new-disk-1/ouafhome_1/ouaf_1
+App Output Dir - Logs ... (SPLOUTPUT) : /home/oracle/new-disk-1/ouafhome_1/log/ouaf_1
 ```
