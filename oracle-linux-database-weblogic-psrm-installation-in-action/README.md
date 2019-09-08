@@ -8,17 +8,18 @@
 | ---- | ----------------------------- |
 | CPU  | 2 core, with VT-x/EPT enabled |
 | MEM  | 至少 2G，建议 4G              |
-| DISK | 40G, SCSI, 精简置备           |
+| DISK | 60G, SCSI, 精简置备           |
 
 软件版本如下。
 
-| 软件                       | 版本       |
-| -------------------------- | ---------- |
-| Oracle Linux 7 x64         | 7.6        |
-| Oracle Database 12c x64    | 12.2.0.1.0 |
-| Oracle WebLogic Server 12c | 12.2.1.3.0 |
-| OUAF                       | 4.3.0.4.0  |
-| PSRM                       | 2.5.0.1.0  |
+| 软件                           | 版本       |
+| ------------------------------ | ---------- |
+| Oracle Linux 7 x64             | 7.6        |
+| Oracle Database 12c x64        | 12.2.0.1.0 |
+| Oracle Database 12c Client x64 | 12.2.0.1.0 |
+| Oracle WebLogic Server 12c     | 12.2.1.3.0 |
+| OUAF                           | 4.3.0.4.0  |
+| PSRM                           | 2.5.0.1.0  |
 
 ## 安装 Oracle Linux
 
@@ -214,11 +215,6 @@ javac
     sysctl -p
     ```
 
-    检查用户与用户组是否正确创建。
-
-    ```shell
-    ```
-
     自动创建的 `oracle` 用户默认密码为空，需要为 `oracle` 用户设置密码，以便能进行 SSH 远程登录及操作。
 
     ```shell
@@ -337,7 +333,18 @@ dbca
 注意 PSRM 需要下面两个 Oracle 数据库特性支持，安装时要关注一下：
 
 - Oracle Spatial OR Oracle Locator
--Oracle Text
+- Oracle Text
+
+可以在 sqlplus 中运行查询确认。
+
+```sql
+SELECT COMP_NAME, STATUS FROM DBA_REGISTRY WHERE COMP_NAME IN ('Spatial','Oracle Text');
+
+--- COMP_NAME         STATUS
+---------------- --------------------------------------------
+--- Oracle Text       VALID
+--- Spatial           VALID
+```
 
 ### 通过 EM Express 管理数据库
 
@@ -360,7 +367,7 @@ EM Express 登录页面，填写用户名，密码，选中 as sysdba，留空 C
   安装全部结束后，默认情况下没有数据库用户被启用。如果需要手动启用数据库内的用户，参考：
 
   ```shell
-  sqlplus
+  sqlplus /nolog
   ```
 
   ```sql
@@ -378,7 +385,6 @@ EM Express 登录页面，填写用户名，密码，选中 as sysdba，留空 C
 ## 安装 WebLogic
 
 可以参考：https://blog.csdn.net/acmman/article/details/70093877，但因为版本不同，启动安装程序的方式不同。
-
 
 下载 "Generic Installer (800 MB)" 解压缩。
 
@@ -471,11 +477,15 @@ sudo chsh -s /bin/ksh <username>
 echo $SHELL
 ```
 
-### 安装 Oracle Client
+### 可选安装 Oracle Client
 
-> 注意：即便是在同一台机器上安装了 Oracle Database，也需要安装 Oracle Database Client。后面 PSRM 安装时需要 Client 路径里的 Perl。
+> 注意：即便是在同一台机器上安装了 Oracle Database，就无需安装 Oracle Database Client 了。
+> 后面 PSRM 安装时需要 Oracle Database 或者 Client 路径里的 Perl。
+> 本文主要是以都装在同一台机器上举例。
 
-解压缩 Client 安装包，并执行安装程序。
+如果不是在Oracle Database 的机器上装 WebLogic 和 PSRM，那么就需要装 Client 安装包。
+
+执行安装程序。
 
 ```shell
 unzip linuxx64_12201_client.zip
@@ -492,15 +502,18 @@ unzip linuxx64_12201_client.zip
 
 ```shell
 export ORACLE_CLIENT_HOME=$ORACLE_BASE/product/12.2.0/clienthome_1
-#export PATH=${ORACLE_CLIENT_HOME}/perl/bin:${PATH}
 ```
 
-后面安装 PSRM 的 OUAF 时，无论系统自带的 perl 还是 oracle client 安装后附带的 perl，本地 PERL_LIB 中都没有 `CGI.pm` 这个模块，导致安装失败。
+### 设置环境变量
+
+无论系统自带的 perl 还是 oracle database / client 安装后附带的 perl，Perl Lib 中都没有 `CGI.pm` 这个模块，
+后面安装 PSRM 的 OUAF 时导致安装失败。
 
 这里手动装一下 `CGI.pm` 模块。
 
 ```shell
-export PERL_HOME=${ORACLE_CLIENT_HOME}/perl
+export PERL_HOME=${ORACLE_HOME}/perl
+#或者安装的是 Client 的话 export PERL_HOME=${ORACLE_CLIENT_HOME}/perl
 export PATH=${PERL_HOME}/bin:${PATH}
 export PERL5LIB=$PERL_HOME/lib:$PERL_HOME/lib/site_perl:${INSTALLDIR}/data/bin/perllib
 
@@ -765,13 +778,25 @@ ${JAVA_HOME}/bin/java -Xmx1500M \
     com.oracle.ouaf.oem.install.OraDBI
 
 ###
-## 非交互方式如下，命令行需要
+## 非交互方式如下，我主要用的这个
 ${JAVA_HOME}/bin/java -Xmx1500M \
    -cp ${PWD}/../jarfiles/*:${CLASSPATH} \
    com.oracle.ouaf.oem.install.OraDBI \
    -d ol7gui:1521/orcl,CISADM,CISADM,CISUSER,CISREAD,CIS_USER,CIS_READ,CISADM \
    -j ${JAVA_HOME} \
    -l 1,2
+```
+
+接下来需要启用数据库 USER_LOCK 包。
+
+```shell
+sqlplus /nolog
+SQL> conn sys/sysadm@ol7gui:1521/orcl as sysdba
+```
+
+```sql
+@?/rdbms/admin/userlock.sql
+grant execute on USER_LOCK to public;
 ```
 
 ### 安装 OUAF 应用
@@ -926,12 +951,12 @@ mkdir -p /home/oracle/new-disk-1/ouafhome_1/log
 |   Certificate Keystore Type | CERT_KS                    | DEMO                   |
 |      Identify Keystore File | CERT_IDENT_KS_FILE         | [ 留空 ]               |
 | Identify Keystore File Type | CERT_IDENT_KS_TYPE         | jks                    |
-|  Identify Keystore Password | CERT_IDENT_KS_PWD          | jks                    |
-|  Identity Private Key Alias | CERT_IDENT_KS_ALIAS        | ouaf_demo_cert         |
+|  Identify Keystore Password | CERT_IDENT_KS_PWD          | 123456 [ 6 位以上 ]    |
+|  Identity Private Key Alias | CERT_IDENT_KS_ALIAS        | ouaf_demo_cert_ident   |
 |         Trust Keystore File | CERT_TRUST_KS_FILE         | [ 留空 ]               |
 |    Trust Keystore File Type | CERT_TRUST_KS_TYPE         | jks                    |
-|     Trust Keystore Password | CERT_TRUST_KS_PWD          | jks                    |
-|     Trust Private Key Alias | CERT_TRUST_KS_ALIAS        | ouaf_demo_cert         |
+|     Trust Keystore Password | CERT_TRUST_KS_PWD          | 123456 [ 6 位以上 ]    |
+|     Trust Private Key Alias | CERT_TRUST_KS_ALIAS        | ouaf_demo_cert_trust   |
 
 选择 7，根据提示按下表配置。
 
@@ -958,7 +983,7 @@ mkdir -p /home/oracle/new-disk-1/ouafhome_1/log
 
 回到安装脚本运行的控制台，输入 Y 继续。
 
-> 注意，如果在运行 `cistab_ouaf_1.sh` 之后安装过程异常终止了，需要以 root 编辑 `/etc/cistab` 文件，删除其中的 `Environment Name` 如 `ouaf_1` 对应行。
+> 注意，如果在运行 `cistab_ouaf_1.sh` 之后安装过程异常终止了，需要以 root 编辑 `/etc/cistab` 文件，删除其中的 `Environment Name` 如 `ouaf_1` 对应行。然后重新运行 install.sh 就可以重装了。
 
 直至最后安装成功，下面是输出结果。
 
@@ -976,3 +1001,211 @@ Environment Name ....... (SPLENVIRON) : ouaf_1
 Environment Code Directory (SPLEBASE) : /home/oracle/new-disk-1/ouafhome_1/ouaf_1
 App Output Dir - Logs ... (SPLOUTPUT) : /home/oracle/new-disk-1/ouafhome_1/log/ouaf_1
 ```
+
+安装后 OUAF 应用会自动启动，以后要启动或关闭 OUAF（及在 OUAF 基础上安装的 PSRM），可以使用下面命令。
+
+```shell
+$SPLEBASE/bin/spl.sh start
+$SPLEBASE/bin/spl.sh stop
+```
+
+### 安装 PSRM 应用
+
+如果上面的 OUAF 应用安装后直接执行后续的 PSRM 应用安装，相关环境变量就已经设置好了。
+否则，需要在安装 PSRM 前，先用下述命令设置对应的环境（也即，在此情况下，要执行其他操作或者 postinstall 步骤，都需要先执行下述脚本设置环境）。
+
+其中 $SPLEBASE 是 OUAF 安装的目录，如上文的 `/home/oracle/new-disk-1/ouafhome_1/ouaf_1` 目录。
+
+```shell
+$SPLEBASE/bin/splenviron.sh -e $SPLENVIRON
+```
+
+停止正在运行的 OUAF 应用。
+
+```shell
+$SPLEBASE/bin/spl.sh stop
+```
+
+#### 安装补丁包
+
+解包补丁安装文件，修改 `FW-V4.3.0.4.0-Rollup/Application` 脚本运行权限，执行升级脚本。
+
+```shell
+jar -xvf PSRM-V25010-FW-PREREQ-MultiPlatform.jar
+
+cd ./FW-V4.3.0.4.0-Rollup/Application
+chmod a+x installSFgroup.sh
+chmod a+x FW*/*.sh
+
+./installSFgroup.sh
+```
+
+修改 `FW-V4.3.0.4.0-Rollup/Database/CDXPatch` 脚本运行权限，执行升级脚本。
+
+```shell
+cd ../../FW-V4.3.0.4.0-Rollup/Database/CDXPatch
+chmod a+x *.sh
+
+./ouafDatabasePatch.sh -p "-t O -d CISADM,ol7gui:1521:orcl"
+```
+
+#### 安装主应用
+
+官网文档中要以 `cissys` 用户登录 Linux，我们单机安装一直使用的 `oracle` 用户，这里继续使用。
+
+解包安装文件，执行安装脚本。
+
+```shell
+jar -xvf Release-PSRM-V2.5.0.1.0-Linux.jar
+cd ./Release-TAX-V2.5.0.1.0-Linux/TAX.V2.5.0.1.0
+
+chmod a+x install.sh
+
+./install.sh
+```
+
+会显示一个配置清单，有 2， P， X 可以选。选择 2 后根据提示按下表配置。
+
+|                            Menu Option | Name Used in Documentation | Customer Install Value |
+| -------------------------------------: | -------------------------- | ---------------------- |
+| JVM Child Process Starting Port Number |                            | 6503                   |
+|          Number of JVM Child Processes |                            | 2                      |
+
+然后选择 P 开始执行。
+
+完成后，执行两个脚本。
+
+```shell
+$SPLEBASE/bin/splenviron.sh -e $SPLENVIRON
+$SPLEBASE/bin/configureEnv.sh
+```
+
+提示输入时，按 P 直接执行。执行完再运行下面的脚本。
+
+```shell
+$SPLEBASE/bin/splenviron.sh -e $SPLENVIRON
+$SPLEBASE/bin/initialSetup.sh
+```
+
+最后生成证书。
+
+```shell
+cd $SPLEBASE/bin
+perl demo_gen_cert.plx
+```
+
+> 在 JDK 8 u161 以上版本运行 `perl demo_gen_cert.plx` 可能会报错 `java.security.InvalidKeyException: exponent is larger than modulus`，
+> 这是一个已知 BUG，参见 https://docs.oracle.com/middleware/12213/wls/WLSRN/issues.htm#WLSRN-GUID-F1A75EF1-2B11-4CA6-85D8-D95B5F0DFD8E
+>
+> 解决办法是编辑 `$SPLEBASE/bindemo_gen_cert.plx` 文件，找到 `utils.CertGen -certfile` 字样，改为 `utils.CertGen -noskid -certfile`。
+>
+> 保存文件重新运行 `perl demo_gen_cert.plx` 命令。
+
+运行过程中提示输入密码，就是上面 `Identify Keystore Password` 和 `Trust Keystore Password`。
+
+至此安装全部成功，用以下命令启动 PSRM。
+
+```shell
+$SPLEBASE/bin/spl.sh start
+```
+
+启动后 PSRM 的页面访问地址为：https://ol7gui:6501/ouaf/loginPage.jsp
+
+```shell
+# 查看启动日志
+cat /home/oracle/new-disk-1/ouafhome_1/ouaf_1/logs/system/spl.sh.log
+# 运行日志监控
+tail -f /home/oracle/new-disk-1/ouafhome_1/ouaf_1/logs/system/weblogic_current.log
+```
+
+## 日常操作
+
+启动。
+
+```shell
+# 启动数据库
+sqlplus /nolog
+SQL> conn sys/sysadm as sysdba
+SQL> startup
+SQL> exit
+
+# 启动监听
+lsnrctl start
+
+# 启动 weblogic admin
+/home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain/startWebLogic.sh
+## 访问地址 http://ol7gui:7001/console 用户名 weblogic/weblogic6
+
+# 启动 PSRM(OUAF)
+/home/oracle/new-disk-1/ouafhome_1/ouaf_1/bin/splenviron.sh -e ouaf_1
+$SPLEBASE/bin/spl.sh start
+```
+
+## 附录
+
+可以用 sqlplus 下面语句查询数据库 CIS* 对象，有助于确认是否正确创建了数据库结构。
+如果 STATUS 里有 Invalid 字样要注意。
+
+```sql
+select owner,object_type, status,count(*) from dba_objects where owner like 'CIS%' group by owner,object_type, status order by 1,2;
+
+--- OWNER OBJECT_TYPE STATUS COUNT(*)
+-----------------------------------
+```
+
+> 找到一篇 Oracle CCB 的安装文字，虽不是同样应用，但都基于 OUAF，也可以借鉴参考。
+> https://ccb2501.blogspot.com/2015/11/step-by-step-install-oracle-utilities.html
+
+### 问题
+
+启动不成功
+
+修改了 $SPLEBASE/splapp/setEnv.sh 注释了 CLASSPATH 赋值和导出，因为其调用的 splapp/startWLS.sh 里也做了重复设置。
+
+修改了 $SPLEBASE/splapp/startWebLogic.sh，改为了 `STARTMODE=false` 因为安装时选择的是开发模式。
+
+修改了 $SPLEBASE/splapp/config.xml 里边感觉是大错特错，下面这段是改过后的设置。
+
+```xml
+    <realm>
+      <sec:authentication-provider xsi:type="wls:default-authenticatorType">
+        <sec:name>DefaultAuthenticator</sec:name>
+      </sec:authentication-provider>
+      <sec:authentication-provider xsi:type="wls:default-identity-asserterType">
+        <sec:name>DefaultIdentityAsserter</sec:name>
+        <sec:active-type>AuthenticatedUser</sec:active-type>
+      </sec:authentication-provider>
+      <sec:role-mapper xsi:type="xacml:xacml-role-mapperType">
+        <sec:name>XACMLRoleMapper</sec:name>
+      </sec:role-mapper>
+      <sec:authorizer xsi:type="xacml:xacml-authorizerType">
+        <sec:name>XACMLAuthorizer</sec:name>
+      </sec:authorizer>
+      <sec:adjudicator xseni:type="wls:default-adjudicatorType">
+        <sec:name>DefaultAdjudicator</sec:name>
+      </sec:adjudicator>
+      <sec:credential-mapper xsi:type="wls:default-credential-mapperType">
+        <sec:name>DefaultCredentialMapper</sec:name>
+      </sec:credential-mapper>
+      <sec:cert-path-provider xsi:type="wls:web-logic-cert-path-providerType">
+        <sec:name>WebLogicCertPathProvider</sec:name>
+      </sec:cert-path-provider>
+      <sec:cert-path-builder>WebLogicCertPathProvider</sec:cert-path-builder>
+      <sec:user-lockout-manager></sec:user-lockout-manager>
+      <sec:security-dd-model>Advanced</sec:security-dd-model>
+      <sec:combined-role-mapping-enabled>false</sec:combined-role-mapping-enabled>
+      <sec:name>myrealm</sec:name>
+    </realm>
+```
+
+但还是报错。
+
+```plain
+<Sep 8, 2019 2:39:59 AM GMT> <Critical> <WebLogicServer> <BEA-000386> <Server subsystem failed. Reason: A MultiException has 3 exceptions.  They are:
+1. weblogic.management.ManagementException: [Management:141266]Parsing failure in config.xml: The following failures occurred:
+-- Unresolved reference to WebLogicCertPathProvider by [splapp]/SecurityConfiguration[splapp]/Realms[myrealm]/CertPathBuilder
+.
+2. java.lang.IllegalStateException: Unable to perform operation: create on weblogic.management.provider.internal.RuntimeAccessImpl
+3. java.lang.IllegalStateException: Unable to perform operation: post construct on weblogic.management.provider.internal.RuntimeAccessService
+```
+
