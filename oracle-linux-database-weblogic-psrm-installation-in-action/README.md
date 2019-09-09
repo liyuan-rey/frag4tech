@@ -1,6 +1,38 @@
 # Oracle Linux，Database，WebLogic Server，PSRM 安装实战
 
-## 安装版本信息
+<!-- TOC depthFrom:2 orderedList:true -->
+- [Oracle Linux，Database，WebLogic Server，PSRM 安装实战](#oracle-linuxdatabaseweblogic-serverpsrm-%e5%ae%89%e8%a3%85%e5%ae%9e%e6%88%98)
+  - [1 安装版本信息](#1-%e5%ae%89%e8%a3%85%e7%89%88%e6%9c%ac%e4%bf%a1%e6%81%af)
+  - [2 安装 Oracle Linux](#2-%e5%ae%89%e8%a3%85-oracle-linux)
+    - [2.1 关于 swap 空间扩容](#21-%e5%85%b3%e4%ba%8e-swap-%e7%a9%ba%e9%97%b4%e6%89%a9%e5%ae%b9)
+  - [3 安装 Oracle JDK](#3-%e5%ae%89%e8%a3%85-oracle-jdk)
+    - [3.1 关于 OpenJDK](#31-%e5%85%b3%e4%ba%8e-openjdk)
+  - [4 Oracle Database](#4-oracle-database)
+    - [4.1 关于先安装数据库软件，后创建数据库](#41-%e5%85%b3%e4%ba%8e%e5%85%88%e5%ae%89%e8%a3%85%e6%95%b0%e6%8d%ae%e5%ba%93%e8%bd%af%e4%bb%b6%e5%90%8e%e5%88%9b%e5%bb%ba%e6%95%b0%e6%8d%ae%e5%ba%93)
+    - [4.2 通过 EM Express 管理数据库](#42-%e9%80%9a%e8%bf%87-em-express-%e7%ae%a1%e7%90%86%e6%95%b0%e6%8d%ae%e5%ba%93)
+    - [4.3 其他](#43-%e5%85%b6%e4%bb%96)
+  - [5 安装 WebLogic](#5-%e5%ae%89%e8%a3%85-weblogic)
+  - [6 安装 PSRM](#6-%e5%ae%89%e8%a3%85-psrm)
+    - [6.1 用户和用户组](#61-%e7%94%a8%e6%88%b7%e5%92%8c%e7%94%a8%e6%88%b7%e7%bb%84)
+    - [6.2 可选安装 Oracle Client](#62-%e5%8f%af%e9%80%89%e5%ae%89%e8%a3%85-oracle-client)
+    - [6.3 设置环境变量](#63-%e8%ae%be%e7%bd%ae%e7%8e%af%e5%a2%83%e5%8f%98%e9%87%8f)
+    - [6.3.1 补充安装 Perl 模块 CGI.pm](#631-%e8%a1%a5%e5%85%85%e5%ae%89%e8%a3%85-perl-%e6%a8%a1%e5%9d%97-cgipm)
+    - [6.3.2 关于 ksh](#632-%e5%85%b3%e4%ba%8e-ksh)
+    - [6.4 安装 Hibernate](#64-%e5%ae%89%e8%a3%85-hibernate)
+    - [6.5 创建数据库](#65-%e5%88%9b%e5%bb%ba%e6%95%b0%e6%8d%ae%e5%ba%93)
+    - [6.6 初始化 PSRM 数据库](#66-%e5%88%9d%e5%a7%8b%e5%8c%96-psrm-%e6%95%b0%e6%8d%ae%e5%ba%93)
+    - [6.7 安装 OUAF 应用](#67-%e5%ae%89%e8%a3%85-ouaf-%e5%ba%94%e7%94%a8)
+    - [6.8 安装 PSRM 应用](#68-%e5%ae%89%e8%a3%85-psrm-%e5%ba%94%e7%94%a8)
+      - [6.8.1 安装补丁包](#681-%e5%ae%89%e8%a3%85%e8%a1%a5%e4%b8%81%e5%8c%85)
+      - [6.8.2 安装主应用](#682-%e5%ae%89%e8%a3%85%e4%b8%bb%e5%ba%94%e7%94%a8)
+  - [7 日常操作](#7-%e6%97%a5%e5%b8%b8%e6%93%8d%e4%bd%9c)
+  - [8 附录](#8-%e9%99%84%e5%bd%95)
+    - [8.1 参考一](#81-%e5%8f%82%e8%80%83%e4%b8%80)
+    - [8.2 参考二](#82-%e5%8f%82%e8%80%83%e4%ba%8c)
+    - [8.3 现存问题](#83-%e7%8e%b0%e5%ad%98%e9%97%ae%e9%a2%98)
+<!-- /TOC -->
+
+## 1 安装版本信息
 
 使用笔记本电脑，创建了单台 VMware Workstation 15 Player 虚拟机进行安装部署，配置如下。
 
@@ -21,7 +53,7 @@
 | OUAF                           | 4.3.0.4.0  |
 | PSRM                           | 2.5.0.1.0  |
 
-## 安装 Oracle Linux
+## 2 安装 Oracle Linux
 
 1. 图形化界面安装比较简单，就不多说了，以下几点选项请注意：
 
@@ -30,7 +62,7 @@
    - 选择了 “Server with GUI” 安装选项，右侧选择用了默认值。
    - 可以直接创建名为 `oracle` 的管理员用户，当然也可以创建其他管理员用户，待操作系统安装好后再创建普通 `oracle` 用户（更安全，但做开发用途时不太方便）。
 
-1. 安装好系统后的一个好习惯是更新软件包到最新版本。
+2. 安装好系统后的一个好习惯是更新软件包到最新版本。
 
     用 root 运行。
 
@@ -45,7 +77,7 @@
     sudo /usr/bin/ol_yum_configure.sh
     ```
 
-1. 修改主机名和 IP 解析记录，我用的是 `ol7gui`。
+3. 修改主机名和 IP 解析记录，我用的是 `ol7gui`。
 
     ```shell
     # 修改主机名，将 hostname 文件内容修改为 ol7gui
@@ -54,7 +86,7 @@
     vim /etc/hosts
     ```
 
-1. `SELinux` 和 `firewalld`
+4. `SELinux` 和 `firewalld`
 
     理论上并不需要停用 `SELinux` 或者 `firewalld`。
 
@@ -71,7 +103,7 @@
     systemctl disable firewalld.service
     ```
 
-### 关于 swap 空间扩容
+### 2.1 关于 swap 空间扩容
 
 以前装Linux服务器系统的时候，系统有2G内存，swap交换分区分了2G，现在系统内存加到了4G，建议增加交换分区。
 
@@ -111,7 +143,7 @@
     # free -m 查看swap分区大小
     ```
 
-## 安装 Oracle JDK
+## 3 安装 Oracle JDK
 
 发现系统自带的和通过 yum 安装的 OpenJDK 似乎都不完整，所以还是准备安装 Oracle JDK。
 
@@ -158,7 +190,7 @@ java -version
 javac
 ```
 
-### 关于 OpenJDK
+### 3.1 关于 OpenJDK
 
 1. 查找 OpenJDK 目录
 
@@ -197,7 +229,7 @@ javac
     source /etc/profile
     ```
 
-## Oracle Database
+## 4 Oracle Database
 
 1. 使用 Oracle Database 12c 预配置包
 
@@ -318,7 +350,7 @@ javac
     #lsnrctl stop
     ```
 
-### 关于先安装数据库软件，后创建数据库
+### 4.1 关于先安装数据库软件，后创建数据库
 
 如果选择了安装数据库软件而不创建数据库，那么可以在数据库软件安装完成后，单独使用 “Database Configuration Assistant (DBCA)” 工具来创建数据库。
 
@@ -332,8 +364,8 @@ dbca
 
 注意 PSRM 需要下面两个 Oracle 数据库特性支持，安装时要关注一下：
 
-   - Oracle Spatial OR Oracle Locator
-   - Oracle Text
+- Oracle Spatial OR Oracle Locator
+- Oracle Text
 
 可以在 sqlplus 中运行查询确认。
 
@@ -346,7 +378,7 @@ SELECT COMP_NAME, STATUS FROM DBA_REGISTRY WHERE COMP_NAME IN ('Spatial','Oracle
 --- Spatial           VALID
 ```
 
-### 通过 EM Express 管理数据库
+### 4.2 通过 EM Express 管理数据库
 
 启动数据库及 Listener 后，用系统自带 Firefox 访问：
 
@@ -362,7 +394,7 @@ yum localinstall flash-player-npapi-32.0.0.238-release.x86_64.rpm
 
 EM Express 登录页面，填写用户名，密码，选中 as sysdba，留空 Container 就可以登录。
 
-### 其他
+### 4.3 其他
 
 安装全部结束后，默认情况下没有数据库用户被启用。如果需要手动启用数据库内的用户，参考：
 
@@ -382,7 +414,7 @@ ALTER USER <account> IDENTIFIED BY <password> ACCOUNT UNLOCK
 conn scott/passwd@ip:1521/orcl
 ```
 
-## 安装 WebLogic
+## 5 安装 WebLogic
 
 可以参考：https://blog.csdn.net/acmman/article/details/70093877，但因为版本不同，启动安装程序的方式不同。
 
@@ -392,6 +424,7 @@ conn scott/passwd@ip:1521/orcl
 
 ```shell
 java -jar fmw_12.2.1.3.0_wls.jar
+```
 
 解压缩要 800M /tmp 目录空间。
 
@@ -425,30 +458,28 @@ java -jar fmw_12.2.1.3.0_wls.jar
 
 用浏览器打开 “http://ol7gui:7001/console” 可以看到登录界面，用 `weblogic` 用户登录后可以看到管理界面。
 
-## 安装 PSRM
-
-### 涉及的软件清单
+## 6 安装 PSRM
 
 PSRM 的依赖软件清单如下，这些软件需要在安装 PSRM 之前就绪：
 
-    - 操作系统
-      - Oracle Linux 6.5+ or 7.x (64-bit) Red Hat Enterprise Linux 6.x or 7.x (64-bit)
-    - 数据库服务器
-      - Oracle Database Server 12.1.0.1+ Standard or Enterprise Edition
-    - 应用服务器
-      - Oracle Java Development Kit Version 8+, 64-bit
-      - Oracle Client 12.1.0.1+
-      - Hibernate 4.1.0 FINAL and hibernate-search-5.5.4.Final-dist
-      - Oracle WebLogic Server 12.1.3.0+ (64-bit) or Oracle WebLogic 12c (12.2.1.1+) 64-bit, as required
+- 操作系统
+  - Oracle Linux 6.5+ or 7.x (64-bit) Red Hat Enterprise Linux 6.x or 7.x (64-bit)
+- 数据库服务器
+  - Oracle Database Server 12.1.0.1+ Standard or Enterprise Edition
+- 应用服务器
+  - Oracle Java Development Kit Version 8+, 64-bit
+  - Oracle Client 12.1.0.1+
+  - Hibernate 4.1.0 FINAL and hibernate-search-5.5.4.Final-dist
+  - Oracle WebLogic Server 12.1.3.0+ (64-bit) or Oracle WebLogic 12c (12.2.1.1+) 64-bit, as required
 
 PSRM 软件自身需要安装的内容：
 
-    - OUAF 数据库及更新补丁
-    - PSRM 数据库
-    - OUAF WebLogic Web 应用
-    - PSRM WebLogic Web 应用
+- OUAF 数据库及更新补丁
+- PSRM 数据库
+- OUAF WebLogic Web 应用
+- PSRM WebLogic Web 应用
 
-### 用户和用户组
+### 6.1 用户和用户组
 
 官方文档要求创建 `cissys` 用户和 `cisusr` 用户组。
 
@@ -459,28 +490,7 @@ PSRM 软件自身需要安装的内容：
 
 我们搭建单台开发环境，不需要这么复杂，所以直接使用了安装 Oracle 数据库时的 `oracle` 用户。
 
-### 关于 ksh
-
-官方文档要求使用 `ksh`，不过我尝试使用系统默认的 `bash` 也正常完成了安装过程。
-
-如果想要安装 ksh，下面是一些参考。
-
-```shell
-# 检查 ksh 是否已安装
-ksh --version
-# 如果没有安装，安装之
-sudo yum install ksh
-# 安装后检查 ksh 是否已经是被允许的 shell 之一，输出应该至少包含 "/bin/ksh" 这一行
-cat /etc/shells | grep ksh
-# 改变 <username> 用户的 shell 为 ksh
-sudo chsh -s /bin/ksh <username>
-# 登出用户，然后重新用 <username> 登录
-#......
-# 检测当前 shell 是否为 ksh，预期输出应为 "/bin/ksh"
-echo $SHELL
-```
-
-### 可选安装 Oracle Client
+### 6.2 可选安装 Oracle Client
 
 > 注意：即便是在同一台机器上安装了 Oracle Database，就无需安装 Oracle Database Client 了。
 > 后面 PSRM 安装时需要 Oracle Database 或者 Client 路径里的 Perl。
@@ -507,7 +517,24 @@ unzip linuxx64_12201_client.zip
 export ORACLE_CLIENT_HOME=$ORACLE_BASE/product/12.2.0/clienthome_1
 ```
 
-### 设置环境变量
+### 6.3 设置环境变量
+
+编辑用户 Shell 初始化环境，这里我们用的默认的 Bash Shell。
+
+```shell
+vim ~/.bash_profile
+```
+
+然后把上述环境变量加入 `~./bash_profile` 文件。
+
+```shell
+export PERL_HOME=${ORACLE_HOME}/perl
+#或者安装的是 Client 的话 export PERL_HOME=${ORACLE_CLIENT_HOME}/perl
+export PATH=${PERL_HOME}/bin:${PATH}
+export PERL5LIB=$PERL_HOME/lib:$PERL_HOME/lib/site_perl:${INSTALLDIR}/data/bin/perllib
+```
+
+### 6.3.1 补充安装 Perl 模块 CGI.pm
 
 无论系统自带的 perl 还是 oracle database / client 安装后附带的 perl，Perl Lib 中都没有 `CGI.pm` 这个模块，
 后面安装 PSRM 的 OUAF 时导致安装失败。
@@ -515,11 +542,6 @@ export ORACLE_CLIENT_HOME=$ORACLE_BASE/product/12.2.0/clienthome_1
 这里手动装一下 `CGI.pm` 模块。
 
 ```shell
-export PERL_HOME=${ORACLE_HOME}/perl
-#或者安装的是 Client 的话 export PERL_HOME=${ORACLE_CLIENT_HOME}/perl
-export PATH=${PERL_HOME}/bin:${PATH}
-export PERL5LIB=$PERL_HOME/lib:$PERL_HOME/lib/site_perl:${INSTALLDIR}/data/bin/perllib
-
 su # 切换到 root 身份，运行后续命令
 
 perl -e shell -MCPAN
@@ -528,12 +550,33 @@ perl -e shell -MCPAN
 install CGI
 ```
 
-### 安装 Hibernate
+### 6.3.2 关于 ksh
+
+官方文档要求使用 `ksh`，不过我尝试使用系统默认的 `bash` 也正常完成了安装过程。
+
+如果想要安装 ksh，下面是一些参考。注意 ksh 的 Shell 初始化脚本是 `~/.kshrc`。
+
+```shell
+# 检查 ksh 是否已安装
+ksh --version
+# 如果没有安装，安装之
+sudo yum install ksh
+# 安装后检查 ksh 是否已经是被允许的 shell 之一，输出应该至少包含 "/bin/ksh" 这一行
+cat /etc/shells | grep ksh
+# 改变 <username> 用户的 shell 为 ksh
+sudo chsh -s /bin/ksh <username>
+# 登出用户，然后重新用 <username> 登录
+#......
+# 检测当前 shell 是否为 ksh，预期输出应为 "/bin/ksh"
+echo $SHELL
+```
+
+### 6.4 安装 Hibernate
 
 下载精确版本的 Hibernate 软件包：
 
-    - `hibernate-release-4.1.0.Final.zip`： http://sourceforge.net/projects/hibernate/files/hibernate4/
-    - `hibernate-search-5.5.4.Final-dist.zip`： https://sourceforge.net/projects/hibernate/files/hibernate-search/
+- `hibernate-release-4.1.0.Final.zip`： http://sourceforge.net/projects/hibernate/files/hibernate4/
+- `hibernate-search-5.5.4.Final-dist.zip`： https://sourceforge.net/projects/hibernate/files/hibernate-search/
 
 解压文件，创建目录并复制需要的文件。
 
@@ -577,7 +620,7 @@ export HIBERNATE_JAR_DIR=/home/oracle/lib/hibernate/mixed-for-psrm-2.5.0.1
 source ~/.bash_profile
 ```
 
-### 创建数据库
+### 6.5 创建数据库
 
 启动之前安装好的 Oracle Database 数据库，并启动监听。
 
@@ -638,7 +681,7 @@ GRANT CIS_READ TO CISREAD;
 GRANT CONNECT TO CISREAD;
 ```
 
-### 初始化 PSRM 数据库
+### 6.6 初始化 PSRM 数据库
 
 解压缩 PSRM 2.5.0.1 版本安装文件。
 
@@ -783,11 +826,11 @@ ${JAVA_HOME}/bin/java -Xmx1500M \
 ###
 ## 非交互方式如下，我主要用的这个
 ${JAVA_HOME}/bin/java -Xmx1500M \
-   -cp ${PWD}/../jarfiles/*:${CLASSPATH} \
-   com.oracle.ouaf.oem.install.OraDBI \
-   -d ol7gui:1521/orcl,CISADM,CISADM,CISUSER,CISREAD,CIS_USER,CIS_READ,CISADM \
-   -j ${JAVA_HOME} \
-   -l 1,2
+  -cp ${PWD}/../jarfiles/*:${CLASSPATH} \
+  com.oracle.ouaf.oem.install.OraDBI \
+  -d ol7gui:1521/orcl,CISADM,CISADM,CISUSER,CISREAD,CIS_USER,CIS_READ,CISADM \
+  -j ${JAVA_HOME} \
+  -l 1,2
 ```
 
 接下来需要启用数据库 USER_LOCK 包。
@@ -802,7 +845,7 @@ SQL> conn sys/sysadm@ol7gui:1521/orcl as sysdba
 grant execute on USER_LOCK to public;
 ```
 
-### 安装 OUAF 应用
+### 6.7 安装 OUAF 应用
 
 运行 OUAF 安装脚本。
 
@@ -1012,7 +1055,7 @@ $SPLEBASE/bin/spl.sh start
 $SPLEBASE/bin/spl.sh stop
 ```
 
-### 安装 PSRM 应用
+### 6.8 安装 PSRM 应用
 
 如果上面的 OUAF 应用安装后直接执行后续的 PSRM 应用安装，相关环境变量就已经设置好了。
 否则，需要在安装 PSRM 前，先用下述命令设置对应的环境（也即，在此情况下，要执行其他操作或者 postinstall 步骤，都需要先执行下述脚本设置环境）。
@@ -1029,7 +1072,7 @@ $SPLEBASE/bin/splenviron.sh -e $SPLENVIRON
 $SPLEBASE/bin/spl.sh stop
 ```
 
-#### 安装补丁包
+#### 6.8.1 安装补丁包
 
 解包补丁安装文件，修改 `FW-V4.3.0.4.0-Rollup/Application` 脚本运行权限，执行升级脚本。
 
@@ -1052,7 +1095,7 @@ chmod a+x *.sh
 ./ouafDatabasePatch.sh -p "-t O -d CISADM,ol7gui:1521:orcl"
 ```
 
-#### 安装主应用
+#### 6.8.2 安装主应用
 
 官网文档中要以 `cissys` 用户登录 Linux，我们单机安装一直使用的 `oracle` 用户，这里继续使用。
 
@@ -1121,7 +1164,7 @@ cat /home/oracle/new-disk-1/ouafhome_1/ouaf_1/logs/system/spl.sh.log
 tail -f /home/oracle/new-disk-1/ouafhome_1/ouaf_1/logs/system/weblogic_current.log
 ```
 
-## 日常操作
+## 7 日常操作
 
 启动。
 
@@ -1144,14 +1187,14 @@ lsnrctl start
 $SPLEBASE/bin/spl.sh start
 ```
 
-## 附录
+## 8 附录
 
-### 参考一
+### 8.1 参考一
 
 > 找到一篇 Oracle CCB 的安装文字，虽不是同样应用，但都基于 OUAF，也可以借鉴参考。
 > https://ccb2501.blogspot.com/2015/11/step-by-step-install-oracle-utilities.html
 
-### 参考二
+### 8.2 参考二
 
 可以用 sqlplus 下面语句查询数据库 CIS* 对象，有助于确认是否正确创建了数据库结构。
 如果 STATUS 里有 Invalid 字样要注意。
@@ -1163,7 +1206,7 @@ select owner,object_type, status,count(*) from dba_objects where owner like 'CIS
 -----------------------------------
 ```
 
-### 现存问题
+### 8.3 现存问题
 
 启动不成功
 
