@@ -79,37 +79,37 @@
 
 1. 查看swap 空间大小(总计)：我的已经加完了，引用另外一台机子的查看内容。
 
-```shell
-free -m
-#             total       used       free     shared    buffers     cached
-#Mem:          7985        756       7228          0         98        263
-#-/+ buffers/cache:        394       7590
-#Swap:         8189          0       8189
-```
+    ```shell
+    free -m
+    #             total       used       free     shared    buffers     cached
+    #Mem:          7985        756       7228          0         98        263
+    #-/+ buffers/cache:        394       7590
+    #Swap:         8189          0       8189
+    ```
 
 1. 增加 4G 的交换空间
 
-```shell
-dd if=/dev/zero of=/usr/swap bs=1024 count=4096000   #/usr/swap 文件在的位置
-```
+    ```shell
+    dd if=/dev/zero of=/usr/swap bs=1024 count=4096000   #/usr/swap 文件在的位置
+    ```
 
-如果是增加2G，则 count=2048000
+    如果是增加2G，则 count=2048000
 
-```shell
-# 设置交换分区
-mkswap /usr/swap
+    ```shell
+    # 设置交换分区
+    mkswap /usr/swap
 
-# 启动交换分区
-swapon /usr/swap
+    # 启动交换分区
+    swapon /usr/swap
 
-#此时Top命令看到交换分区增加了，此时重启后发现 swap空间又变回2G了，怎么办呢？又查了下内容发现还有一步。
+    #此时Top命令看到交换分区增加了，此时重启后发现 swap空间又变回2G了，怎么办呢？又查了下内容发现还有一步。
 
-# 修改/etc/fstab文件，使得新加的16G交换空间在系统重新启动后自动生效在文件最后加入：
-vi /etc/fstab 增加下列内容 i进入修改模式
-#    /usr/swap  swap      swap defaults 0 0
+    # 修改/etc/fstab文件，使得新加的16G交换空间在系统重新启动后自动生效在文件最后加入：
+    vi /etc/fstab 增加下列内容 i进入修改模式
+    #    /usr/swap  swap      swap defaults 0 0
 
-# free -m 查看swap分区大小
-```
+    # free -m 查看swap分区大小
+    ```
 
 ## 安装 Oracle JDK
 
@@ -332,8 +332,8 @@ dbca
 
 注意 PSRM 需要下面两个 Oracle 数据库特性支持，安装时要关注一下：
 
-    - Oracle Spatial OR Oracle Locator
-    - Oracle Text
+   - Oracle Spatial OR Oracle Locator
+   - Oracle Text
 
 可以在 sqlplus 中运行查询确认。
 
@@ -364,23 +364,23 @@ EM Express 登录页面，填写用户名，密码，选中 as sysdba，留空 C
 
 ### 其他
 
-  安装全部结束后，默认情况下没有数据库用户被启用。如果需要手动启用数据库内的用户，参考：
+安装全部结束后，默认情况下没有数据库用户被启用。如果需要手动启用数据库内的用户，参考：
 
-  ```shell
-  sqlplus /nolog
-  ```
+```shell
+sqlplus /nolog
+```
 
-  ```sql
-  CONNECT SYS/sysadm as SYSDBA
-  -- Enter password: sys_password
-  ALTER USER <account> IDENTIFIED BY <password> ACCOUNT UNLOCK
-  ```
+```sql
+CONNECT SYS/sysadm as SYSDBA
+-- Enter password: sys_password
+ALTER USER <account> IDENTIFIED BY <password> ACCOUNT UNLOCK
+```
 
-  启用后，客户端用 sqlplus 连接时，类似如下命令：
+启用后，客户端用 sqlplus 连接时，类似如下命令：
 
-  ```sql
-  conn scott/passwd@ip:1521/orcl
-  ```
+```sql
+conn scott/passwd@ip:1521/orcl
+```
 
 ## 安装 WebLogic
 
@@ -401,10 +401,10 @@ java -jar fmw_12.2.1.3.0_wls.jar
 
 - 创建新 domain。
 - domain 安装位置：/home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain
-- 使用产品模板创建 domain，选择所有模板，选择所有 checkbox
+- 使用产品模板创建 domain，选择所有模板，选择所有 checkbox (也可以只装 `Basic WebLogic Server Domain` 但我没试)
 - 配置管理员账户名称、口令：weblogic/weblogic6。后面 PSRM 的 OUAF 安装时会用到，查找本文 `WLS_WEB_WLSYSUSER` 和 `WLS_WEB_WLSYSPASS`。
 - Domain Mode 选择 Development。JDK 路径部分会自动检测到 JAVA_HOME 指定的 JDK。我这里用的 Oracle JDK，而不是 Oracle OpenJDK。
-- 高级配置选择全部 5 项 checkbox。
+- 高级配置选择全部 5 项 checkbox。（也可以不选任何高级配置，后面可以少配几项）
 - 管理服务器名称：AdminServer，监听地址：All Local Addresses，监听端口：7001。选择不启用 SSL。
 - 节点管理器类型：按域的默认位置，节点管理器身份证明用户名、口令未创建新的，而是用之前的管理员账户名和口令：weblogic/weblogic6
 - 受管服务器、集群配置页都用默认为空
