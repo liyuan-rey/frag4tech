@@ -1,6 +1,6 @@
 # Oracle Linux，Database，WebLogic Server，PSRM 安装实战
 
-## 版本信息
+## 安装版本信息
 
 使用笔记本电脑，创建了单台 VMware Workstation 15 Player 虚拟机进行安装部署，配置如下。
 
@@ -56,20 +56,20 @@
 
 1. `SELinux` 和 `firewalld`
 
-    注意并不需要停用 `SELinux` 或者 `firewalld`。
+    理论上并不需要停用 `SELinux` 或者 `firewalld`。
 
-### 关于关闭 SELinux 和 firewalld
+    如果一定想要关闭，可以参考下面的步骤。
 
-用 root 用户运行。
+    用 root 用户运行。
 
-```shell
-sed -i s#SELINUX=enforcing#SELINUX=disabled#g /etc/selinux/config
-setenforce 0
-egrep "SELINUX=disabled" /etc/selinux/config
-getenforce
-systemctl stop firewalld.service
-systemctl disable firewalld.service
-```
+    ```shell
+    sed -i s#SELINUX=enforcing#SELINUX=disabled#g /etc/selinux/config
+    setenforce 0
+    egrep "SELINUX=disabled" /etc/selinux/config
+    getenforce
+    systemctl stop firewalld.service
+    systemctl disable firewalld.service
+    ```
 
 ### 关于 swap 空间扩容
 
@@ -332,8 +332,8 @@ dbca
 
 注意 PSRM 需要下面两个 Oracle 数据库特性支持，安装时要关注一下：
 
-- Oracle Spatial OR Oracle Locator
-- Oracle Text
+    - Oracle Spatial OR Oracle Locator
+    - Oracle Text
 
 可以在 sqlplus 中运行查询确认。
 
@@ -431,19 +431,22 @@ java -jar fmw_12.2.1.3.0_wls.jar
 
 PSRM 的依赖软件清单如下，这些软件需要在安装 PSRM 之前就绪：
 
-- 操作系统
-  - Oracle Linux 6.5+ or 7.x (64-bit) Red Hat Enterprise Linux 6.x or 7.x (64-bit)
-- 数据库服务器
-  - Oracle Database Server 12.1.0.1+ Standard or Enterprise Edition
-- 应用服务器
-  - Oracle Java Development Kit Version 8+, 64-bit
-  - Oracle Client 12.1.0.1+
-  - Hibernate 4.1.0 FINAL and hibernate-search-5.5.4.Final-dist
-  - Oracle WebLogic Server 12.1.3.0+ (64-bit) or Oracle WebLogic 12c (12.2.1.1+) 64-bit, as required
+    - 操作系统
+      - Oracle Linux 6.5+ or 7.x (64-bit) Red Hat Enterprise Linux 6.x or 7.x (64-bit)
+    - 数据库服务器
+      - Oracle Database Server 12.1.0.1+ Standard or Enterprise Edition
+    - 应用服务器
+      - Oracle Java Development Kit Version 8+, 64-bit
+      - Oracle Client 12.1.0.1+
+      - Hibernate 4.1.0 FINAL and hibernate-search-5.5.4.Final-dist
+      - Oracle WebLogic Server 12.1.3.0+ (64-bit) or Oracle WebLogic 12c (12.2.1.1+) 64-bit, as required
 
 PSRM 软件自身需要安装的内容：
 
-- ...
+    - OUAF 数据库及更新补丁
+    - PSRM 数据库
+    - OUAF WebLogic Web 应用
+    - PSRM WebLogic Web 应用
 
 ### 用户和用户组
 
@@ -529,8 +532,8 @@ install CGI
 
 下载精确版本的 Hibernate 软件包：
 
-- `hibernate-release-4.1.0.Final.zip`： http://sourceforge.net/projects/hibernate/files/hibernate4/
-- `hibernate-search-5.5.4.Final-dist.zip`： https://sourceforge.net/projects/hibernate/files/hibernate-search/
+    - `hibernate-release-4.1.0.Final.zip`： http://sourceforge.net/projects/hibernate/files/hibernate4/
+    - `hibernate-search-5.5.4.Final-dist.zip`： https://sourceforge.net/projects/hibernate/files/hibernate-search/
 
 解压文件，创建目录并复制需要的文件。
 
@@ -1143,6 +1146,13 @@ $SPLEBASE/bin/spl.sh start
 
 ## 附录
 
+### 参考一
+
+> 找到一篇 Oracle CCB 的安装文字，虽不是同样应用，但都基于 OUAF，也可以借鉴参考。
+> https://ccb2501.blogspot.com/2015/11/step-by-step-install-oracle-utilities.html
+
+### 参考二
+
 可以用 sqlplus 下面语句查询数据库 CIS* 对象，有助于确认是否正确创建了数据库结构。
 如果 STATUS 里有 Invalid 字样要注意。
 
@@ -1153,10 +1163,7 @@ select owner,object_type, status,count(*) from dba_objects where owner like 'CIS
 -----------------------------------
 ```
 
-> 找到一篇 Oracle CCB 的安装文字，虽不是同样应用，但都基于 OUAF，也可以借鉴参考。
-> https://ccb2501.blogspot.com/2015/11/step-by-step-install-oracle-utilities.html
-
-### 问题
+### 现存问题
 
 启动不成功
 
@@ -1209,3 +1216,4 @@ select owner,object_type, status,count(*) from dba_objects where owner like 'CIS
 3. java.lang.IllegalStateException: Unable to perform operation: post construct on weblogic.management.provider.internal.RuntimeAccessService
 ```
 
+感觉是 PSRM 2.5.0.1 和 WebLogic 12.2.x 不兼容？还在找原因。
