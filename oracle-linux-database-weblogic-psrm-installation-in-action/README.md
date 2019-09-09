@@ -1,36 +1,34 @@
 # Oracle Linux，Database，WebLogic Server，PSRM 安装实战
 
-<!-- TOC depthFrom:2 orderedList:true -->
-- [Oracle Linux，Database，WebLogic Server，PSRM 安装实战](#oracle-linuxdatabaseweblogic-serverpsrm-%e5%ae%89%e8%a3%85%e5%ae%9e%e6%88%98)
-  - [1 安装版本信息](#1-%e5%ae%89%e8%a3%85%e7%89%88%e6%9c%ac%e4%bf%a1%e6%81%af)
-  - [2 安装 Oracle Linux](#2-%e5%ae%89%e8%a3%85-oracle-linux)
-    - [2.1 关于 swap 空间扩容](#21-%e5%85%b3%e4%ba%8e-swap-%e7%a9%ba%e9%97%b4%e6%89%a9%e5%ae%b9)
-  - [3 安装 Oracle JDK](#3-%e5%ae%89%e8%a3%85-oracle-jdk)
-    - [3.1 关于 OpenJDK](#31-%e5%85%b3%e4%ba%8e-openjdk)
-  - [4 Oracle Database](#4-oracle-database)
-    - [4.1 关于先安装数据库软件，后创建数据库](#41-%e5%85%b3%e4%ba%8e%e5%85%88%e5%ae%89%e8%a3%85%e6%95%b0%e6%8d%ae%e5%ba%93%e8%bd%af%e4%bb%b6%e5%90%8e%e5%88%9b%e5%bb%ba%e6%95%b0%e6%8d%ae%e5%ba%93)
-    - [4.2 通过 EM Express 管理数据库](#42-%e9%80%9a%e8%bf%87-em-express-%e7%ae%a1%e7%90%86%e6%95%b0%e6%8d%ae%e5%ba%93)
-    - [4.3 其他](#43-%e5%85%b6%e4%bb%96)
-  - [5 安装 WebLogic](#5-%e5%ae%89%e8%a3%85-weblogic)
-  - [6 安装 PSRM](#6-%e5%ae%89%e8%a3%85-psrm)
-    - [6.1 用户和用户组](#61-%e7%94%a8%e6%88%b7%e5%92%8c%e7%94%a8%e6%88%b7%e7%bb%84)
-    - [6.2 可选安装 Oracle Client](#62-%e5%8f%af%e9%80%89%e5%ae%89%e8%a3%85-oracle-client)
-    - [6.3 设置环境变量](#63-%e8%ae%be%e7%bd%ae%e7%8e%af%e5%a2%83%e5%8f%98%e9%87%8f)
-    - [6.3.1 补充安装 Perl 模块 `CGI.pm`](#631-%e8%a1%a5%e5%85%85%e5%ae%89%e8%a3%85-perl-%e6%a8%a1%e5%9d%97-cgipm)
-    - [6.3.2 关于 ksh](#632-%e5%85%b3%e4%ba%8e-ksh)
-    - [6.4 安装 Hibernate](#64-%e5%ae%89%e8%a3%85-hibernate)
-    - [6.5 创建数据库](#65-%e5%88%9b%e5%bb%ba%e6%95%b0%e6%8d%ae%e5%ba%93)
-    - [6.6 初始化 PSRM 数据库](#66-%e5%88%9d%e5%a7%8b%e5%8c%96-psrm-%e6%95%b0%e6%8d%ae%e5%ba%93)
-    - [6.7 安装 OUAF 应用](#67-%e5%ae%89%e8%a3%85-ouaf-%e5%ba%94%e7%94%a8)
-    - [6.8 安装 PSRM 应用](#68-%e5%ae%89%e8%a3%85-psrm-%e5%ba%94%e7%94%a8)
-      - [6.8.1 安装补丁包](#681-%e5%ae%89%e8%a3%85%e8%a1%a5%e4%b8%81%e5%8c%85)
-      - [6.8.2 安装主应用](#682-%e5%ae%89%e8%a3%85%e4%b8%bb%e5%ba%94%e7%94%a8)
-  - [7 日常操作](#7-%e6%97%a5%e5%b8%b8%e6%93%8d%e4%bd%9c)
-  - [8 附录](#8-%e9%99%84%e5%bd%95)
-    - [8.1 参考一](#81-%e5%8f%82%e8%80%83%e4%b8%80)
-    - [8.2 参考二](#82-%e5%8f%82%e8%80%83%e4%ba%8c)
-    - [8.3 现存问题](#83-%e7%8e%b0%e5%ad%98%e9%97%ae%e9%a2%98)
-<!-- /TOC -->
+- [1 安装版本信息](#1-安装版本信息)
+- [2 安装 Oracle Linux](#2-安装-oracle-linux)
+  - [2.1 关于一些习惯的说明](#21-关于一些习惯的说明)
+  - [2.2 关于 swap 空间扩容](#22-关于-swap-空间扩容)
+- [3 安装 Oracle JDK](#3-安装-oracle-jdk)
+  - [3.1 关于 OpenJDK](#31-关于-openjdk)
+- [4 Oracle Database](#4-oracle-database)
+  - [4.1 关于先安装数据库软件，后创建数据库](#41-关于先安装数据库软件后创建数据库)
+  - [4.2 通过 EM Express 管理数据库](#42-通过-em-express-管理数据库)
+  - [4.3 其他](#43-其他)
+- [5 安装 WebLogic](#5-安装-weblogic)
+- [6 安装 PSRM](#6-安装-psrm)
+  - [6.1 用户和用户组](#61-用户和用户组)
+  - [6.2 可选安装 Oracle Client](#62-可选安装-oracle-client)
+  - [6.3 设置环境变量](#63-设置环境变量)
+  - [6.3.1 补充安装 Perl 模块 `CGI.pm`](#631-补充安装-perl-模块-cgipm)
+  - [6.3.2 关于 ksh](#632-关于-ksh)
+  - [6.4 安装 Hibernate](#64-安装-hibernate)
+  - [6.5 创建数据库](#65-创建数据库)
+  - [6.6 初始化 PSRM 数据库](#66-初始化-psrm-数据库)
+  - [6.7 安装 OUAF 应用](#67-安装-ouaf-应用)
+  - [6.8 安装 PSRM 应用](#68-安装-psrm-应用)
+    - [6.8.1 安装补丁包](#681-安装补丁包)
+    - [6.8.2 安装主应用](#682-安装主应用)
+- [7 日常操作](#7-日常操作)
+- [8 附录](#8-附录)
+  - [8.1 参考一](#81-参考一)
+  - [8.2 参考二](#82-参考二)
+  - [8.3 现存问题](#83-现存问题)
 
 ## 1 安装版本信息
 
@@ -62,7 +60,7 @@
    - 选择了 “Server with GUI” 安装选项，右侧选择用了默认值。
    - 可以直接创建名为 `oracle` 的管理员用户，当然也可以创建其他管理员用户，待操作系统安装好后再创建普通 `oracle` 用户（更安全，但做开发用途时不太方便）。
 
-2. 安装好系统后的一个好习惯是更新软件包到最新版本。
+1. 安装好系统后的一个好习惯是更新软件包到最新版本。
 
     用 root 运行。
 
@@ -77,7 +75,7 @@
     sudo /usr/bin/ol_yum_configure.sh
     ```
 
-3. 修改主机名和 IP 解析记录，我用的是 `ol7gui`。
+1. 修改主机名和 IP 解析记录，我用的是 `ol7gui`。
 
     ```shell
     # 修改主机名，将 hostname 文件内容修改为 ol7gui
@@ -86,7 +84,7 @@
     vim /etc/hosts
     ```
 
-4. `SELinux` 和 `firewalld`
+1. `SELinux` 和 `firewalld`
 
     理论上并不需要停用 `SELinux` 或者 `firewalld`。
 
@@ -103,7 +101,17 @@
     systemctl disable firewalld.service
     ```
 
-### 2.1 关于 swap 空间扩容
+### 2.1 关于一些习惯的说明
+
+我创建了一个临时目录，将所有需要的安装包及这些安装包的解压动作都放在这个目录下，安装完成后清理起来比较方便。
+
+后续安装过程中没有特别说明的话，都是在这个目录中解压安装包，然后再运行的。
+
+```shell
+mkdir ~/temp
+```
+
+### 2.2 关于 swap 空间扩容
 
 以前装Linux服务器系统的时候，系统有2G内存，swap交换分区分了2G，现在系统内存加到了4G，建议增加交换分区。
 
@@ -152,7 +160,7 @@
 ```shell
 # 查找 `installed` OpenJDK
 yum list | grep openjdk
-# 根据查找结果删除
+# 根据上面查找结果删除
 yum remove *openjdk*
 ```
 
@@ -205,7 +213,7 @@ javac
 
     这里的 "/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.el7_6.x86_64" 就是 OpenJDK 安装路径。
 
-2. 设置 OpenJDK 环境变量
+1. 设置 OpenJDK 环境变量
 
     以 root 用户编辑文件。
 
