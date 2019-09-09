@@ -16,7 +16,7 @@
     - [6.1 用户和用户组](#61-%e7%94%a8%e6%88%b7%e5%92%8c%e7%94%a8%e6%88%b7%e7%bb%84)
     - [6.2 可选安装 Oracle Client](#62-%e5%8f%af%e9%80%89%e5%ae%89%e8%a3%85-oracle-client)
     - [6.3 设置环境变量](#63-%e8%ae%be%e7%bd%ae%e7%8e%af%e5%a2%83%e5%8f%98%e9%87%8f)
-    - [6.3.1 补充安装 Perl 模块 CGI.pm](#631-%e8%a1%a5%e5%85%85%e5%ae%89%e8%a3%85-perl-%e6%a8%a1%e5%9d%97-cgipm)
+    - [6.3.1 补充安装 Perl 模块 `CGI.pm`](#631-%e8%a1%a5%e5%85%85%e5%ae%89%e8%a3%85-perl-%e6%a8%a1%e5%9d%97-cgipm)
     - [6.3.2 关于 ksh](#632-%e5%85%b3%e4%ba%8e-ksh)
     - [6.4 安装 Hibernate](#64-%e5%ae%89%e8%a3%85-hibernate)
     - [6.5 创建数据库](#65-%e5%88%9b%e5%bb%ba%e6%95%b0%e6%8d%ae%e5%ba%93)
@@ -525,7 +525,7 @@ export ORACLE_CLIENT_HOME=$ORACLE_BASE/product/12.2.0/clienthome_1
 vim ~/.bash_profile
 ```
 
-然后把上述环境变量加入 `~./bash_profile` 文件。
+然后把上面设置的环境变量加入 `~./bash_profile` 文件。
 
 ```shell
 export PERL_HOME=${ORACLE_HOME}/perl
@@ -534,7 +534,13 @@ export PATH=${PERL_HOME}/bin:${PATH}
 export PERL5LIB=$PERL_HOME/lib:$PERL_HOME/lib/site_perl:${INSTALLDIR}/data/bin/perllib
 ```
 
-### 6.3.1 补充安装 Perl 模块 CGI.pm
+让配置生效。
+
+```shell
+source ~/.bash_profile
+```
+
+### 6.3.1 补充安装 Perl 模块 `CGI.pm`
 
 无论系统自带的 perl 还是 oracle database / client 安装后附带的 perl，Perl Lib 中都没有 `CGI.pm` 这个模块，
 后面安装 PSRM 的 OUAF 时导致安装失败。
