@@ -29,6 +29,7 @@
   - [8.1 参考一](#81-参考一)
   - [8.2 参考二](#82-参考二)
   - [8.3 现存问题](#83-现存问题)
+  - [8.4 下面是多次验证后发现不必做的修改](#84-下面是多次验证后发现不必做的修改)
 
 ## 1 安装版本信息
 
@@ -101,6 +102,8 @@
     systemctl disable firewalld.service
     ```
 
+> **特别注意，后续安装软件时，指定路径都不要有空格。**
+
 ### 2.1 关于一些习惯的说明
 
 我创建了一个临时目录，将所有需要的安装包及这些安装包的解压动作都放在这个目录下，安装完成后清理起来比较方便。
@@ -127,7 +130,7 @@ mkdir ~/temp
     #Swap:         8189          0       8189
     ```
 
-1. 增加 4G 的交换空间
+2. 增加 4G 的交换空间
 
     ```shell
     dd if=/dev/zero of=/usr/swap bs=1024 count=4096000   #/usr/swap 文件在的位置
@@ -922,7 +925,7 @@ mkdir -p /home/oracle/new-disk-1/ouafhome_1/log
 |                   Log File Mount Point | SPLDIROUT                  | /home/oracle/new-disk-1/ouafhome_1/log |
 |                       Environment Name | SPLENVIRON                 | ouaf_1 [ 这个比较重要 ]                |
 |            Web Application Server Type | SPLWAS                     | WLS                                    |
-| Installation Application Viewer Module | WEB_ISAPPVIEWER            | true                                   |
+| Installation Application Viewer Module | WEB_ISAPPVIEWER            | true [ 生产环境用 false ]              |
 |    Install Demo Generation Cert Script | CERT_INSTALL_SCRIPT        | true                                   |
 |          Install Sample CM Source Code | CM_INSTALL_SAMPLE          | true                                   |
 
@@ -948,24 +951,24 @@ mkdir -p /home/oracle/new-disk-1/ouafhome_1/log
 
 选择 3，根据提示按下表配置。
 
-|                               Menu Option | Name Used in Documentation | Customer Install Value                                          |
-| ----------------------------------------: | -------------------------- | --------------------------------------------------------------- |
-|                           Web Server Host | WEB_WLHOST                 | ol7gui                                                          |
-|                  Weblogic SSL Port Number | WEB_WLSSLPORT              | 6501                                                            |
-|              Weblogic Console Port Number | WLS_ADMIN_PORT             | 6500                                                            |
-|        Weblogic Additional Stop Arguments | ADDITIONAL_STOP_WEBLOGIC   | -                                                               |
-|                          Web Context Root | WEB_CONTEXT_ROOT           | ouaf                                                            |
-|                     WebLogic JNDI User ID | WEB_WLSYSUSER              | oracle [ 这里要的是 LDAP 账户，必填所以随便填了个操作系统用户 ] |
-|                    WebLogic JNDI Password | WEB_WLSYSPASS              | oracle                                                          |
-|             WebLogic Admin System User ID | WLS_WEB_WLSYSUSER          | weblogic [ weblogic 安装时的管理员账户 ]                        |
-|            WebLogic Admin System Password | WLS_WEB_WLSYSPASS          | weblogic6                                                       |
-|                      WebLogic Server Name | WEB_WLS_SVRNAME            | myserver                                                        |
-|               Web Server Application Name | WEB_APP                    | SPLWeb                                                          |
-|                Deploy Using Archive Files | WEB_DEPLOY_EAR             | true                                                            |
-|          Deploy Application Viewer Module | WEB_DEPLOY_APPVIEWER       | true                                                            |
-| Enable The Unsecured Health Check Service | WEB_ENABLE_HEALTHCHECK     | false                                                           |
-|                         MDB RunAs User ID | WEB_IWS_MDB_RUNAS_USER     | [ 留空 ]                                                        |
-|                            Super User Ids | WEB_IWS_SUPER_USERS        | SYSUSER ？                                                      |
+|                               Menu Option | Name Used in Documentation | Customer Install Value                    |
+| ----------------------------------------: | -------------------------- | ----------------------------------------- |
+|                           Web Server Host | WEB_WLHOST                 | ol7gui                                    |
+|                  Weblogic SSL Port Number | WEB_WLSSLPORT              | 6501                                      |
+|              Weblogic Console Port Number | WLS_ADMIN_PORT             | 6500                                      |
+|        Weblogic Additional Stop Arguments | ADDITIONAL_STOP_WEBLOGIC   | -                                         |
+|                          Web Context Root | WEB_CONTEXT_ROOT           | ouaf                                      |
+|                     WebLogic JNDI User ID | WEB_WLSYSUSER              | system [ 这里要的是 LDAP 账户 ]           |
+|                    WebLogic JNDI Password | WEB_WLSYSPASS              | ouafadmin                                 |
+|             WebLogic Admin System User ID | WLS_WEB_WLSYSUSER          | system [ 必须填这个，否则启动报用户错误 ] |
+|            WebLogic Admin System Password | WLS_WEB_WLSYSPASS          | ouafadmin [ 必须填这个 ]                  |
+|                      WebLogic Server Name | WEB_WLS_SVRNAME            | myserver                                  |
+|               Web Server Application Name | WEB_APP                    | SPLWeb                                    |
+|                Deploy Using Archive Files | WEB_DEPLOY_EAR             | false [ 生产环境用 true ]                 |
+|          Deploy Application Viewer Module | WEB_DEPLOY_APPVIEWER       | true [ 生产环境用 false ]                 |
+| Enable The Unsecured Health Check Service | WEB_ENABLE_HEALTHCHECK     | false                                     |
+|                         MDB RunAs User ID | WEB_IWS_MDB_RUNAS_USER     | [ 留空 ]                                  |
+|                            Super User Ids | WEB_IWS_SUPER_USERS        | SYSUSER [ 必须填这个 ]                    |
 
 选择 4，根据提示按下表配置。
 
@@ -979,11 +982,11 @@ mkdir -p /home/oracle/new-disk-1/ouafhome_1/log
 |                XAI Database Password | XAI_DBPASS                 | CISADM                    |
 |               Batch Database User ID | BATCH_DBUSER               | CISADM                    |
 |              Batch Database Password | BATCH_DBPASS               | CISADM                    |
-|             Web JDBC DataSource Name | JDBC_NAME                  | [ 留空 ]                  |
-|                JDBC Database User ID | DBUSER_WLS                 | [ 留空 ]                  |
-|               JDBC Database Password | DBPASS_WLS                 | [ 留空 ]                  |
+|             Web JDBC DataSource Name | JDBC_NAME                  | ouaf_1_dsrc               |
+|                JDBC Database User ID | DBUSER_WLS                 | CISADM                    |
+|               JDBC Database Password | DBPASS_WLS                 | CISADM                    |
 |                        Database Name | DBNAME                     | orcl                      |
-|                      Database Server | DBSERVER                   | ol7gui                    |
+|                      Database Server | DBSERVER                   | ol7gui ? 192.168.126.133  |
 |                        Database Port | DBPORT                     | 1521                      |
 |             ONS Server Configuration | ONSCONFIG                  | [ 留空 ]                  |
 |  Database Override Connection String | DB_OVERRIDE_CONNECTION     | [ 留空 ]                  |
@@ -1069,15 +1072,19 @@ $SPLEBASE/bin/spl.sh start
 $SPLEBASE/bin/spl.sh stop
 ```
 
+尝试访问地址：https://ol7gui:6501/ouaf 看是否能正常显示页面。
+观察日志：/home/oracle/new-disk-1/ouafhome_1/log/ouaf_1/ 或者 /home/oracle/new-disk-1/ouafhome_1/ouaf_1/logs/system/
+
 ### 6.8 安装 PSRM 应用
 
 如果上面的 OUAF 应用安装后直接执行后续的 PSRM 应用安装，相关环境变量就已经设置好了。
 否则，需要在安装 PSRM 前，先用下述命令设置对应的环境（也即，在此情况下，要执行其他操作或者 postinstall 步骤，都需要先执行下述脚本设置环境）。
 
-其中 $SPLEBASE 是 OUAF 安装的目录，如上文的 `/home/oracle/new-disk-1/ouafhome_1/ouaf_1` 目录。
+其中 `$SPLEBASE` 是 OUAF 安装的目录，如上文的 `/home/oracle/new-disk-1/ouafhome_1/ouaf_1` 目录，`$SPLENVIRON` 是 `ouaf_1`。
 
 ```shell
-$SPLEBASE/bin/splenviron.sh -e $SPLENVIRON
+# $SPLEBASE/bin/splenviron.sh -e $SPLENVIRON
+/home/oracle/new-disk-1/ouafhome_1/ouaf_1/bin/splenviron.sh -e ouaf_1
 ```
 
 停止正在运行的 OUAF 应用。
@@ -1194,11 +1201,14 @@ lsnrctl start
 
 # 启动 weblogic admin
 /home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain/startWebLogic.sh
-## 访问地址 http://ol7gui:7001/console 用户名 weblogic/weblogic6
+## 管理地址 http://ol7gui:7001/console 用户名 weblogic/weblogic6
+## 不启动这个也不影响下面 PSRM 的使用
 
 # 启动 PSRM(OUAF)
 /home/oracle/new-disk-1/ouafhome_1/ouaf_1/bin/splenviron.sh -e ouaf_1
 $SPLEBASE/bin/spl.sh start
+## 访问地址为：https://ol7gui:6501/ouaf/
+## 管理地址为：https://ol7gui:6500/console/ 登录密码 system/ouafadmin
 ```
 
 ## 8 附录
@@ -1224,41 +1234,85 @@ select owner,object_type, status,count(*) from dba_objects where owner like 'CIS
 
 启动不成功
 
-修改了 $SPLEBASE/splapp/setEnv.sh 注释了 CLASSPATH 赋值和导出，因为其调用的 splapp/startWLS.sh 里也做了重复设置。
-
 修改了 $SPLEBASE/splapp/startWebLogic.sh，改为了 `STARTMODE=false` 因为安装时选择的是开发模式。
 
-修改了 $SPLEBASE/splapp/config.xml 里边感觉是大错特错，下面这段是改过后的设置。
+修改了 $SPLEBASE/splapp/startWLS.sh，修改如下。
+
+```shell
+if [ "$ADMIN_URL" != "" ]
+then
+       set -x
+       "${JAVA_HOME}/bin/java" -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp ${JAVA_VM} ${MEM_ARGS} ${JAVA_OPTIONS}  -classpath "${CLASSPATH}" -Dweblogic.Name=${SERVER_NAME} -Dbea.home=/home/oracle/new-disk-1/ouafhome_1/ouaf_1/product/bea -Dweblogic.management.server=${ADMIN_URL} -Dweblogic.ProductionModeEnabled=${STARTMODE} -Djava.security.policy="${WL_HOME}/server/lib/weblogic.policy" weblogic.Server
+else
+       set -x
+       "${JAVA_HOME}/bin/java" -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp ${JAVA_VM} ${MEM_ARGS} ${JAVA_OPTIONS}  -classpath "${CLASSPATH}" -Dweblogic.Name=${SERVER_NAME} -Dbea.home=/home/oracle/new-disk-1/ouafhome_1/ouaf_1/product/bea -Dweblogic.ProductionModeEnabled=${STARTMODE} -Djava.security.policy="${WL_HOME}/server/lib/weblogic.policy" weblogic.Server
+   fi
+
+### 改为 ###
+# -Dbea.home=/home/oracle/new-disk-1/ouafhome_1/ouaf_1/product/bea 删除或修改，实际位置是在 -Dbea.home=/home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home 目录，或者 写为 -Dbea.home=${WL_HOME}/..
+# 增加 -Dweblogic.configuration.schemaValidationEnabled=false
+```
+
+还是报错如下
+
+```plain
+<Sep 10, 2019 8:34:15,276 PM GMT> <Critical> <Security> <BEA-090402> <Authentication denied: Boot identity not valid. The user name or password or both from the boot identity file (boot.properties) is not valid. The boot identity may have been changed since the boot identity file was created. Please edit and update the boot identity file with the proper values of username and password. The first time the updated boot identity file is used to start the server, these new values are encrypted.> 
+<Sep 10, 2019 8:34:15,313 PM GMT> <Critical> <WebLogicServer> <BEA-000386> <Server subsystem failed. Reason: A MultiException has 6 exceptions.  They are:
+1. weblogic.security.SecurityInitializationException: Authentication denied: Boot identity not valid. The user name or password or both from the boot identity file (boot.properties) is not valid. The boot identity may have been changed since the boot identity file was created. Please edit and update the boot identity file with the proper values of username and password. The first time the updated boot identity file is used to start the server, these new values are encrypted.
+2. java.lang.IllegalStateException: Unable to perform operation: post construct on weblogic.security.SecurityService
+3. java.lang.IllegalArgumentException: While attempting to resolve the dependencies of weblogic.jndi.internal.RemoteNamingService errors were found
+4. java.lang.IllegalStateException: Unable to perform operation: resolve on weblogic.jndi.internal.RemoteNamingService
+5. java.lang.IllegalArgumentException: While attempting to resolve the dependencies of weblogic.deployment.DeploymentRegistrationService errors were found
+6. java.lang.IllegalStateException: Unable to perform operation: resolve on weblogic.deployment.DeploymentRegistrationService
+
+A MultiException has 6 exceptions.  They are:
+1. weblogic.security.SecurityInitializationException: Authentication denied: Boot identity not valid. The user name or password or both from the boot identity file (boot.properties) is not valid. The boot identity may have been changed since the boot identity file was created. Please edit and update the boot identity file with the proper values of username and password. The first time the updated boot identity file is used to start the server, these new values are encrypted.
+2. java.lang.IllegalStateException: Unable to perform operation: post construct on weblogic.security.SecurityService
+3. java.lang.IllegalArgumentException: While attempting to resolve the dependencies of weblogic.jndi.internal.RemoteNamingService errors were found
+4. java.lang.IllegalStateException: Unable to perform operation: resolve on weblogic.jndi.internal.RemoteNamingService
+5. java.lang.IllegalArgumentException: While attempting to resolve the dependencies of weblogic.deployment.DeploymentRegistrationService errors were found
+6. java.lang.IllegalStateException: Unable to perform operation: resolve on weblogic.deployment.DeploymentRegistrationService
+
+	at org.jvnet.hk2.internal.Collector.throwIfErrors(Collector.java:89)
+	at org.jvnet.hk2.internal.ClazzCreator.resolveAllDependencies(ClazzCreator.java:250)
+	at org.jvnet.hk2.internal.ClazzCreator.create(ClazzCreator.java:358)
+	at org.jvnet.hk2.internal.SystemDescriptor.create(SystemDescriptor.java:487)
+	at org.glassfish.hk2.runlevel.internal.AsyncRunLevelContext.findOrCreate(AsyncRunLevelContext.java:305)
+	Truncated. see log file for complete stacktrace
+Caused By: weblogic.security.SecurityInitializationException: Authentication denied: Boot identity not valid. The user name or password or both from the boot identity file (boot.properties) is not valid. The boot identity may have been changed since the boot identity file was created. Please edit and update the boot identity file with the proper values of username and password. The first time the updated boot identity file is used to start the server, these new values are encrypted.
+	at weblogic.security.service.CommonSecurityServiceManagerDelegateImpl.doBootAuthorization(CommonSecurityServiceManagerDelegateImpl.java:1152)
+	at weblogic.security.service.CommonSecurityServiceManagerDelegateImpl.postInitialize(CommonSecurityServiceManagerDelegateImpl.java:1272)
+	at weblogic.security.service.SecurityServiceManager.postInitialize(SecurityServiceManager.java:586)
+	at weblogic.security.SecurityService.start(SecurityService.java:130)
+	at weblogic.server.AbstractServerService.postConstruct(AbstractServerService.java:76)
+	Truncated. see log file for complete stacktrace
+Caused By: javax.security.auth.login.FailedLoginException: [Security:090938]Authentication failure: The specified user failed to log in. javax.security.auth.login.FailedLoginException: [Security:090302]Authentication Failed: User specified user denied
+	at com.bea.common.security.utils.ExceptionHandler.throwFailedLoginException(ExceptionHandler.java:62)
+	at weblogic.security.providers.authentication.LDAPAtnLoginModuleImpl.login(LDAPAtnLoginModuleImpl.java:380)
+	at com.bea.common.security.internal.service.LoginModuleWrapper$1.run(LoginModuleWrapper.java:117)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at com.bea.common.security.internal.service.LoginModuleWrapper.login(LoginModuleWrapper.java:114)
+	Truncated. see log file for complete stacktrace
+> 
+```
+
+### 8.4 下面是多次验证后发现不必做的修改
+
+```plain
+修改了 $SPLEBASE/splapp/setEnv.sh 注释了 CLASSPATH 赋值和导出，因为其调用的 splapp/startWLS.sh 里也做了重复设置。
+```
+
+修改了 $SPLEBASE/splapp/config.xml 里边感觉是大错特错，下面这段是 `sec:authentication-provider` `sec:cert-path-provider` 改过后的设置。
 
 ```xml
     <realm>
       <sec:authentication-provider xsi:type="wls:default-authenticatorType">
         <sec:name>DefaultAuthenticator</sec:name>
       </sec:authentication-provider>
-      <sec:authentication-provider xsi:type="wls:default-identity-asserterType">
-        <sec:name>DefaultIdentityAsserter</sec:name>
-        <sec:active-type>AuthenticatedUser</sec:active-type>
-      </sec:authentication-provider>
-      <sec:role-mapper xsi:type="xacml:xacml-role-mapperType">
-        <sec:name>XACMLRoleMapper</sec:name>
-      </sec:role-mapper>
-      <sec:authorizer xsi:type="xacml:xacml-authorizerType">
-        <sec:name>XACMLAuthorizer</sec:name>
-      </sec:authorizer>
-      <sec:adjudicator xseni:type="wls:default-adjudicatorType">
-        <sec:name>DefaultAdjudicator</sec:name>
-      </sec:adjudicator>
-      <sec:credential-mapper xsi:type="wls:default-credential-mapperType">
-        <sec:name>DefaultCredentialMapper</sec:name>
-      </sec:credential-mapper>
       <sec:cert-path-provider xsi:type="wls:web-logic-cert-path-providerType">
         <sec:name>WebLogicCertPathProvider</sec:name>
       </sec:cert-path-provider>
       <sec:cert-path-builder>WebLogicCertPathProvider</sec:cert-path-builder>
-      <sec:user-lockout-manager></sec:user-lockout-manager>
-      <sec:security-dd-model>Advanced</sec:security-dd-model>
-      <sec:combined-role-mapping-enabled>false</sec:combined-role-mapping-enabled>
-      <sec:name>myrealm</sec:name>
     </realm>
 ```
 
@@ -1272,5 +1326,3 @@ select owner,object_type, status,count(*) from dba_objects where owner like 'CIS
 2. java.lang.IllegalStateException: Unable to perform operation: create on weblogic.management.provider.internal.RuntimeAccessImpl
 3. java.lang.IllegalStateException: Unable to perform operation: post construct on weblogic.management.provider.internal.RuntimeAccessService
 ```
-
-感觉是 PSRM 2.5.0.1 和 WebLogic 12.2.x 不兼容？还在找原因。
