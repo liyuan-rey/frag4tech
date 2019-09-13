@@ -26,10 +26,11 @@
     - [6.8.2 安装主应用](#682-安装主应用)
 - [7 日常操作](#7-日常操作)
 - [8 附录](#8-附录)
-  - [8.1 参考一](#81-参考一)
-  - [8.2 参考二](#82-参考二)
-  - [8.3 现存问题](#83-现存问题)
-  - [8.4 下面是多次验证后发现不必做的修改](#84-下面是多次验证后发现不必做的修改)
+  - [8.1 参考资料](#81-参考资料)
+  - [8.2 磁盘空间不够增加磁盘](#82-磁盘空间不够增加磁盘)
+  - [8.3 查找大文件和清理大文件](#83-查找大文件和清理大文件)
+  - [8.x 现存问题](#8x-现存问题)
+  - [8.x 下面是多次验证后发现不必做的修改](#8x-下面是多次验证后发现不必做的修改)
 
 ## 1 安装版本信息
 
@@ -862,6 +863,16 @@ SQL> conn sys/sysadm@ol7gui:1521/orcl as sysdba
 grant execute on USER_LOCK to public;
 ```
 
+可以用 sqlplus 下面语句查询数据库 CIS* 对象，有助于确认是否正确创建了数据库结构。
+如果 STATUS 里有 Invalid 字样要注意。
+
+```sql
+select owner,object_type, status,count(*) from dba_objects where owner like 'CIS%' group by owner,object_type, status order by 1,2;
+
+--- OWNER OBJECT_TYPE STATUS COUNT(*)
+-----------------------------------
+```
+
 ### 6.7 安装 OUAF 应用
 
 运行 OUAF 安装脚本。
@@ -1009,17 +1020,17 @@ mkdir -p /home/oracle/new-disk-1/ouafhome_1/log
 
 选择 6，根据提示按下表配置。
 
-|                 Menu Option | Name Used in Documentation | Customer Install Value |
-| --------------------------: | -------------------------- | ---------------------- |
-|   Certificate Keystore Type | CERT_KS                    | DEMO                   |
-|      Identify Keystore File | CERT_IDENT_KS_FILE         | [ 留空 ]               |
-| Identify Keystore File Type | CERT_IDENT_KS_TYPE         | jks                    |
-|  Identify Keystore Password | CERT_IDENT_KS_PWD          | 123456 [ 6 位以上 ]    |
-|  Identity Private Key Alias | CERT_IDENT_KS_ALIAS        | ouaf_demo_cert_ident   |
-|         Trust Keystore File | CERT_TRUST_KS_FILE         | [ 留空 ]               |
-|    Trust Keystore File Type | CERT_TRUST_KS_TYPE         | jks                    |
-|     Trust Keystore Password | CERT_TRUST_KS_PWD          | 123456 [ 6 位以上 ]    |
-|     Trust Private Key Alias | CERT_TRUST_KS_ALIAS        | ouaf_demo_cert_trust   |
+|                 Menu Option | Name Used in Documentation | Customer Install Value                       |
+| --------------------------: | -------------------------- | -------------------------------------------- |
+|   Certificate Keystore Type | CERT_KS                    | DEMO [ 注意按 6.8.2 运行 demo_gen_cert.plx ] |
+|      Identify Keystore File | CERT_IDENT_KS_FILE         | [ 留空 ]                                     |
+| Identify Keystore File Type | CERT_IDENT_KS_TYPE         | jks                                          |
+|  Identify Keystore Password | CERT_IDENT_KS_PWD          | ouafadmin [ 6 位以上 ]                       |
+|  Identity Private Key Alias | CERT_IDENT_KS_ALIAS        | ouaf_demo_cert_ident                         |
+|         Trust Keystore File | CERT_TRUST_KS_FILE         | [ 留空 ]                                     |
+|    Trust Keystore File Type | CERT_TRUST_KS_TYPE         | jks                                          |
+|     Trust Keystore Password | CERT_TRUST_KS_PWD          | ouafadmin [ 6 位以上 ]                       |
+|     Trust Private Key Alias | CERT_TRUST_KS_ALIAS        | ouaf_demo_cert_trust                         |
 
 选择 7，根据提示按下表配置。
 
@@ -1159,6 +1170,7 @@ $SPLEBASE/bin/initialSetup.sh
 ```shell
 cd $SPLEBASE/bin
 perl demo_gen_cert.plx
+# 会提示输入密码，此时要用上面 CERT_IDENT_KS_PWD 和 CERT_TRUST_KS_PWD 设置的密码
 ```
 
 > 在 JDK 8 u161 以上版本运行 `perl demo_gen_cert.plx` 可能会报错 `java.security.InvalidKeyException: exponent is larger than modulus`，
@@ -1213,24 +1225,98 @@ $SPLEBASE/bin/spl.sh start
 
 ## 8 附录
 
-### 8.1 参考一
+### 8.1 参考资料
 
 > 找到一篇 Oracle CCB 的安装文字，虽不是同样应用，但都基于 OUAF，也可以借鉴参考。
 > https://ccb2501.blogspot.com/2015/11/step-by-step-install-oracle-utilities.html
 
-### 8.2 参考二
+### 8.2 磁盘空间不够增加磁盘
 
-可以用 sqlplus 下面语句查询数据库 CIS* 对象，有助于确认是否正确创建了数据库结构。
-如果 STATUS 里有 Invalid 字样要注意。
+当需要在虚拟机中增加磁盘时。
 
-```sql
-select owner,object_type, status,count(*) from dba_objects where owner like 'CIS%' group by owner,object_type, status order by 1,2;
+- 关闭虚拟机
+- 清除已有快照
+- 添加新的虚拟磁盘
+- 重新开启虚拟机
 
---- OWNER OBJECT_TYPE STATUS COUNT(*)
------------------------------------
+以 root 用户运行命令。
+
+```shell
+# 显示磁盘信息
+fdisk -l
+
+### 60G 未格式化磁盘设备 /dev/sdb 显示如下
+Disk /dev/sdb: 64.4 GB, 64424509440 bytes, 125829120 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+
+# 开始分区操作，会进入交互式命令模式
+fdisk /dev/sdb
+
+# 新增分区
+Command (m for help): n
+
+# 选择新增主分区
+Select (default p): p
+
+# 采用默认值将整个磁盘空间都作为一个分区空间
+Partition number (1-4, default 1):
+First sector (2048-125829119, default 2048):
+Using default value 2048
+Last sector, +sectors or +size{K,M,G} (2048-125829119, default 125829119):
+Using default value 125829119
+Partition 1 of type Linux and of size 60 GiB is set
+
+# 将分区信息写入磁盘分区表
+Command (m for help): w
+The partition table has been altered!
+
+# 重新查看磁盘信息
+fdisk -l
+
+### 显示信息中包含未格式化的 /dev/sdb1
+Disk /dev/sdb: 64.4 GB, 64424509440 bytes, 125829120 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk label type: dos
+Disk identifier: 0x6574d689
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sdb1            2048   125829119    62913536   83  Linux
+
+# 在 CentOS 中默认使用 xfs 文件系统进行格式化
+mkfs -t xfs /dev/sdb1
+
+# 创建需要挂载分区的路径
+mkdir /home/<用户名>/disk2
+mount /dev/sdb1   /home/<用户名>/disk2
+
+# 设置开机启动
+vim /etc/fstab
+# 在 fstab 文件最后加上
+/dev/sdb1   /home/<用户名>/disk2    xfs  defaults   0 0
+
+# 将 /home/<用户名>/disk2 目录权限交给 <用户名>
+chown <用户名> /home/<用户名>/disk2
 ```
 
-### 8.3 现存问题
+### 8.3 查找大文件和清理大文件
+
+- Linux 桌面环境回收站中的文件可以清理
+- yum 缓存是可以清理的 `yum clean all`
+- 一些无用的 coredump 文件是可以清理的，用 find 找出来 rm
+- 一些安装用的 zip 包、jar 包等，在安装后如果不再使用，也可以清理
+- /usr/tmp 目录下的临时文件，比如一些运行日志等，如果不用也可以清理
+
+```shell
+# 500M 以上的大文件，从小到大排序
+find . -type f -size +500M  -print0 | xargs -0 du -h | sort -nr
+```
+
+### 8.x 现存问题
 
 启动不成功
 
@@ -1296,7 +1382,7 @@ Caused By: javax.security.auth.login.FailedLoginException: [Security:090938]Auth
 > 
 ```
 
-### 8.4 下面是多次验证后发现不必做的修改
+### 8.x 下面是多次验证后发现不必做的修改
 
 ```plain
 修改了 $SPLEBASE/splapp/setEnv.sh 注释了 CLASSPATH 赋值和导出，因为其调用的 splapp/startWLS.sh 里也做了重复设置。
