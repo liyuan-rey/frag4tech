@@ -16,7 +16,7 @@
   - [6.2 可选安装 Oracle Client](#62-可选安装-oracle-client)
   - [6.3 设置环境变量](#63-设置环境变量)
   - [6.3.1 补充安装 Perl 模块 `CGI.pm`](#631-补充安装-perl-模块-cgipm)
-  - [6.3.2 关于 ksh](#632-关于-ksh)
+  - [6.3.2 安装 ksh](#632-安装-ksh)
   - [6.4 安装 Hibernate](#64-安装-hibernate)
   - [6.5 创建数据库](#65-创建数据库)
   - [6.6 初始化 PSRM 数据库](#66-初始化-psrm-数据库)
@@ -29,8 +29,12 @@
   - [8.1 参考资料](#81-参考资料)
   - [8.2 磁盘空间不够增加磁盘](#82-磁盘空间不够增加磁盘)
   - [8.3 查找大文件和清理大文件](#83-查找大文件和清理大文件)
-  - [8.x 现存问题](#8x-现存问题)
-  - [8.x 下面是多次验证后发现不必做的修改](#8x-下面是多次验证后发现不必做的修改)
+- [9 疑难问题处理](#9-疑难问题处理)
+  - [9.1 问题一](#91-问题一)
+  - [9.2 问题二](#92-问题二)
+  - [9.3 问题三](#93-问题三)
+  - [9.x 现存问题](#9x-现存问题)
+  - [9.x 下面是多次验证后发现不必做的修改，仅作记录](#9x-下面是多次验证后发现不必做的修改仅作记录)
 
 ## 1 安装版本信息
 
@@ -568,11 +572,14 @@ perl -e shell -MCPAN
 install CGI
 ```
 
-### 6.3.2 关于 ksh
+### 6.3.2 安装 ksh
 
-官方文档要求使用 `ksh`，不过我尝试使用系统默认的 `bash` 也正常完成了安装过程。
+官方文档要求使用 `ksh`，PSRM 的执行脚本基本上都是 ksh 的，我们需要安装 ksh，但理论上不用指定 Linux 用户的默认 Shell 为 ksh，因为
+每个 PSRM 脚本都在第一行指明了 `#!/usr/bin/ksh` 指令。我尝试使用系统默认的 `bash` 也正常完成了安装过程。
 
-如果想要安装 ksh，下面是一些参考。注意 ksh 的 Shell 初始化脚本是 `~/.kshrc`。
+也就是说必须安装 ksh，但不必把 ksh 作为用户默认的 Shell 环境。
+
+下面是安装 ksh 的参考。注意 ksh 的 Shell 初始化脚本是 `~/.kshrc`。
 
 ```shell
 # 检查 ksh 是否已安装
@@ -969,7 +976,7 @@ mkdir -p /home/oracle/new-disk-1/ouafhome_1/log
 |              Weblogic Console Port Number | WLS_ADMIN_PORT             | 6500                                      |
 |        Weblogic Additional Stop Arguments | ADDITIONAL_STOP_WEBLOGIC   | -                                         |
 |                          Web Context Root | WEB_CONTEXT_ROOT           | ouaf                                      |
-|                     WebLogic JNDI User ID | WEB_WLSYSUSER              | system [ 这里要的是 LDAP 账户 ]           |
+|                     WebLogic JNDI User ID | WEB_WLSYSUSER              | Admin [ 这里要的是 LDAP 账户 ]            |
 |                    WebLogic JNDI Password | WEB_WLSYSPASS              | ouafadmin                                 |
 |             WebLogic Admin System User ID | WLS_WEB_WLSYSUSER          | system [ 必须填这个，否则启动报用户错误 ] |
 |            WebLogic Admin System Password | WLS_WEB_WLSYSPASS          | ouafadmin [ 必须填这个 ]                  |
@@ -997,7 +1004,7 @@ mkdir -p /home/oracle/new-disk-1/ouafhome_1/log
 |                JDBC Database User ID | DBUSER_WLS                 | CISADM                    |
 |               JDBC Database Password | DBPASS_WLS                 | CISADM                    |
 |                        Database Name | DBNAME                     | orcl                      |
-|                      Database Server | DBSERVER                   | ol7gui ? 192.168.126.133  |
+|                      Database Server | DBSERVER                   | ol7gui                    |
 |                        Database Port | DBPORT                     | 1521                      |
 |             ONS Server Configuration | ONSCONFIG                  | [ 留空 ]                  |
 |  Database Override Connection String | DB_OVERRIDE_CONNECTION     | [ 留空 ]                  |
@@ -1316,15 +1323,16 @@ chown <用户名> /home/<用户名>/disk2
 find . -type f -size +500M  -print0 | xargs -0 du -h | sort -nr
 ```
 
-### 8.x 现存问题
+## 9 疑难问题处理
 
-启动不成功
+如果程序启动不了，可以检查 `$SPLEBASE/logs/system/` 目录下的 `weblogic_current.log` `myserver.log` 等日志文件，察看具体报错信息。
 
-修改了 $SPLEBASE/splapp/startWebLogic.sh，改为了 `STARTMODE=false` 因为安装时选择的是开发模式。
+### 9.1 问题一
 
-修改了 $SPLEBASE/splapp/startWLS.sh，修改如下。
+如果报错找不到 `WebLogicCertPathProvider` 类，需要修改 `$SPLEBASE/splapp/startWLS.sh`，修改如下。
 
 ```shell
+### 原脚本如下 ###
 if [ "$ADMIN_URL" != "" ]
 then
        set -x
@@ -1334,12 +1342,19 @@ else
        "${JAVA_HOME}/bin/java" -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp ${JAVA_VM} ${MEM_ARGS} ${JAVA_OPTIONS}  -classpath "${CLASSPATH}" -Dweblogic.Name=${SERVER_NAME} -Dbea.home=/home/oracle/new-disk-1/ouafhome_1/ouaf_1/product/bea -Dweblogic.ProductionModeEnabled=${STARTMODE} -Djava.security.policy="${WL_HOME}/server/lib/weblogic.policy" weblogic.Server
    fi
 
-### 改为 ###
-# -Dbea.home=/home/oracle/new-disk-1/ouafhome_1/ouaf_1/product/bea 删除或修改，实际位置是在 -Dbea.home=/home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home 目录，或者 写为 -Dbea.home=${WL_HOME}/..
+### 上述 -Dbea.home=... 要改为 ###
+# -Dbea.home=/home/oracle/new-disk-1/ouafhome_1/ouaf_1/product/bea 删除或修改，实际位置是在 -Dbea.home=/home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home 目录，修改可写为 -Dbea.home=${WL_HOME}/..
+```
+
+如果报 `$SPLEBASE/splapp/config/config.xml` 的 Schema 格式错误，需要在上面这个修改的地方再加上一个参数：
+
+```shell
 # 增加 -Dweblogic.configuration.schemaValidationEnabled=false
 ```
 
-还是报错如下
+### 9.2 问题二
+
+如果用 `$SPLEBASE/bin/configureEnv.sh` 脚本做配置时，没有对 `WebLogic Admin System User ID` 和 `WebLogic Admin System Password` 配置项使用默认账户信息 `system/ouafadmin` 就会报以下错误。
 
 ```plain
 <Sep 10, 2019 8:34:15,276 PM GMT> <Critical> <Security> <BEA-090402> <Authentication denied: Boot identity not valid. The user name or password or both from the boot identity file (boot.properties) is not valid. The boot identity may have been changed since the boot identity file was created. Please edit and update the boot identity file with the proper values of username and password. The first time the updated boot identity file is used to start the server, these new values are encrypted.> 
@@ -1379,10 +1394,99 @@ Caused By: javax.security.auth.login.FailedLoginException: [Security:090938]Auth
 	at java.security.AccessController.doPrivileged(Native Method)
 	at com.bea.common.security.internal.service.LoginModuleWrapper.login(LoginModuleWrapper.java:114)
 	Truncated. see log file for complete stacktrace
+>
+```
+
+处理办法是，重新运行 `$SPLEBASE/bin/configureEnv.sh` 进行配置，并且重新运行 `$SPLEBASE/bin/initialSetup.sh` 进行初始化。
+
+### 9.3 问题三
+
+日志里会有个警告说参数指定运行在生产环境，但配置中是开发环境，解决这个警告需要修改 `$SPLEBASE/splapp/startWebLogic.sh`，改为了 `STARTMODE=false` 因为安装时选择的是开发模式。
+
+### 9.x 现存问题
+
+
+```plain
+<Sep 16, 2019 12:50:10,806 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192509> <Changing servlet class from com.sun.jersey.spi.container.servlet.ServletContainer (web.xml) to org.glassfish.jersey.servlet.ServletContainer.> 
+<Sep 16, 2019 12:50:10,847 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ResourceConfig because ApplicationPath annotation is not set on it.> 
+<Sep 16, 2019 12:50:10,849 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ApplicationAdapter because ApplicationPath annotation is not set on it.> 
+<Sep 16, 2019 12:50:10,851 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.server.impl.application.DeferredResourceConfig because ApplicationPath annotation is not set on it.> 
+<Sep 16, 2019 12:50:10,852 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ClassNamesResourceConfig because ApplicationPath annotation is not set on it.> 
+<Sep 16, 2019 12:50:10,852 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.DefaultResourceConfig because ApplicationPath annotation is not set on it.> 
+<Sep 16, 2019 12:50:10,855 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.PackagesResourceConfig because ApplicationPath annotation is not set on it.> 
+<Sep 16, 2019 12:50:10,868 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.servlet.WebAppResourceConfig because ApplicationPath annotation is not set on it.> 
+<Sep 16, 2019 12:50:10,870 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ClasspathResourceConfig because ApplicationPath annotation is not set on it.> 
+<Sep 16, 2019 12:50:10,870 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ScanningResourceConfig because ApplicationPath annotation is not set on it.>
+```
+
+
+
+```plain
+<Sep 16, 2019 12:50:13,318 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192511> <The list of resource packages: com.splwg.base.web.rest> 
+<Sep 16, 2019 12:50:22,532 PM GMT> <Warning> <HTTP> <BEA-101403> <For security constraint with url-pattern /* in web application XAIApp, only the http methods "TRACE DELETE OPTIONS PUT " are covered.> 
+<Sep 16, 2019 12:50:32,606 PM GMT> <Warning> <HTTP> <BEA-101304> <Web application: ServletContext@1934954330[app:XAIApp module:XAIApp path:null spec-version:3.1], the role: ** defined in web.xml has not been mapped to principals in security-role-assignment in weblogic.xml. Will use the rolename itself as the principal-name.> 
+<Sep 16, 2019 12:50:32,597 PM GMT> <Warning> <HTTP> <BEA-101403> <For security constraint with url-pattern /* in web application XAIApp, only the http methods "TRACE DELETE OPTIONS PUT " are covered.> 
+<Sep 16, 2019 12:50:32,606 PM GMT> <Warning> <HTTP> <BEA-101304> <Web application: ServletContext@1934954330[app:XAIApp module:XAIApp path:null spec-version:3.1], the role: ** defined in web.xml has not been mapped to principals in security-role-assignment in weblogic.xml. Will use the rolename itself as the principal-name.> 
+java.lang.NoClassDefFoundError: oracle/adf/share/logging/handler/InternalADFHandler
+
+<Sep 16, 2019 12:50:37,559 PM GMT> <Warning> <HTTP> <BEA-101304> <Web application: ServletContext@633017488[app:ohelp module:ohelp path:null spec-version:3.1], the role: ** defined in web.xml has not been mapped to principals in security-role-assignment in weblogic.xml. Will use the rolename itself as the principal-name.> 
+
+<Sep 16, 2019 12:50:37,590 PM GMT> <Error> <HTTP> <BEA-101165> <Could not load user defined filter in web.xml: oracle.adf.view.rich.webapp.AdfFacesCachingFilter.
+java.lang.NoClassDefFoundError: Could not initialize class oracle.adf.share.ADFContext
+	at oracle.adfinternal.view.faces.caching.filter.AdfFacesCachingFilterImpl.init(AdfFacesCachingFilterImpl.java:85)
+	at oracle.adf.view.rich.webapp.AdfFacesCachingFilter.init(AdfFacesCachingFilter.java:38)
+	at weblogic.servlet.internal.FilterManager$FilterInitAction.run(FilterManager.java:400)
+	at weblogic.security.acl.internal.AuthenticatedSubject.doAs(AuthenticatedSubject.java:326)
+	at weblogic.security.service.SecurityManager.runAsForUserCode(SecurityManager.java:197)
+	Truncated. see log file for complete stacktrace
 > 
 ```
 
-### 8.x 下面是多次验证后发现不必做的修改
+```plain
+<Sep 16, 2019 12:50:39,885 PM GMT> <Warning> <HTTP> <BEA-101162> <User defined listener com.splwg.base.web.startup.SPLWebStartup failed: java.lang.ExceptionInInitializerError.
+java.lang.ExceptionInInitializerError
+	at com.splwg.serviceclient.RemotePageServiceDispatcherHelper.doIt(RemotePageServiceDispatcherHelper.java:17)
+	at com.splwg.serviceclient.RemoteServiceDispatcher.readSystem(RemoteServiceDispatcher.java:42)
+	at com.splwg.base.web.startup.PreloadLoginInfo.getMostPrevalentUserLanguage(PreloadLoginInfo.java:269)
+	at com.splwg.base.web.startup.PreloadLoginInfo.initializeRequestContext(PreloadLoginInfo.java:220)
+	at com.splwg.base.web.startup.PreloadLoginInfo.privateExecute(PreloadLoginInfo.java:70)
+	Truncated. see log file for complete stacktrace
+Caused By: com.splwg.shared.common.LoggedException: Unexpected GeneralSecurityException
+	at com.splwg.shared.common.LoggedException.wrap(LoggedException.java:199)
+	at com.splwg.shared.common.LoggedException.wrap(LoggedException.java:87)
+	at com.splwg.shared.common.cryptography.CryptographyInstance.decrypt(CryptographyInstance.java:139)
+	at com.splwg.shared.common.cryptography.CryptographyInstance.decryptIfNeeded(CryptographyInstance.java:67)
+	at com.splwg.shared.common.Cryptography.decryptIfNeeded(Cryptography.java:109)
+	Truncated. see log file for complete stacktrace
+Caused By: javax.crypto.BadPaddingException: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.
+	at com.sun.crypto.provider.CipherCore.unpad(CipherCore.java:975)
+	at com.sun.crypto.provider.CipherCore.fillOutputBuffer(CipherCore.java:1056)
+	at com.sun.crypto.provider.CipherCore.doFinal(CipherCore.java:853)
+	at com.sun.crypto.provider.AESCipher.engineDoFinal(AESCipher.java:446)
+	at javax.crypto.Cipher.doFinal(Cipher.java:2164)
+	Truncated. see log file for complete stacktrace
+>
+
+<Sep 16, 2019 12:50:39,924 PM GMT> <Error> <Deployer> <BEA-149231> <Unable to set the activation state to true for the application "root".
+weblogic.application.ModuleException: javax.crypto.BadPaddingException: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.
+	at weblogic.application.internal.ExtensibleModuleWrapper.start(ExtensibleModuleWrapper.java:140)
+	at weblogic.application.internal.flow.ModuleListenerInvoker.start(ModuleListenerInvoker.java:124)
+	at weblogic.application.internal.flow.ModuleStateDriver$3.next(ModuleStateDriver.java:233)
+	at weblogic.application.internal.flow.ModuleStateDriver$3.next(ModuleStateDriver.java:228)
+	at weblogic.application.utils.StateMachineDriver.nextState(StateMachineDriver.java:45)
+	Truncated. see log file for complete stacktrace
+Caused By: javax.crypto.BadPaddingException: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.
+	at com.sun.crypto.provider.CipherCore.unpad(CipherCore.java:975)
+	at com.sun.crypto.provider.CipherCore.fillOutputBuffer(CipherCore.java:1056)
+	at com.sun.crypto.provider.CipherCore.doFinal(CipherCore.java:853)
+	at com.sun.crypto.provider.AESCipher.engineDoFinal(AESCipher.java:446)
+	at javax.crypto.Cipher.doFinal(Cipher.java:2164)
+	Truncated. see log file for complete stacktrace
+> 
+```
+
+
+### 9.x 下面是多次验证后发现不必做的修改，仅作记录
 
 ```plain
 修改了 $SPLEBASE/splapp/setEnv.sh 注释了 CLASSPATH 赋值和导出，因为其调用的 splapp/startWLS.sh 里也做了重复设置。
