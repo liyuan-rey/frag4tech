@@ -3,7 +3,6 @@
 - [1 安装版本信息](#1-安装版本信息)
 - [2 安装 Oracle Linux](#2-安装-oracle-linux)
   - [2.1 关于一些习惯的说明](#21-关于一些习惯的说明)
-  - [2.2 关于 swap 空间扩容](#22-关于-swap-空间扩容)
 - [3 安装 Oracle JDK](#3-安装-oracle-jdk)
   - [3.1 关于 OpenJDK](#31-关于-openjdk)
 - [4 Oracle Database](#4-oracle-database)
@@ -27,8 +26,9 @@
 - [7 日常操作](#7-日常操作)
 - [8 附录](#8-附录)
   - [8.1 参考资料](#81-参考资料)
-  - [8.2 磁盘空间不够增加磁盘](#82-磁盘空间不够增加磁盘)
-  - [8.3 查找大文件和清理大文件](#83-查找大文件和清理大文件)
+  - [8.2 关于 swap 空间扩容](#82-关于-swap-空间扩容)
+  - [8.3 磁盘空间不够增加磁盘](#83-磁盘空间不够增加磁盘)
+  - [8.4 查找大文件和清理大文件](#84-查找大文件和清理大文件)
 - [9 疑难问题处理](#9-疑难问题处理)
   - [9.1 问题一](#91-问题一)
   - [9.2 问题二](#92-问题二)
@@ -118,46 +118,6 @@
 ```shell
 mkdir ~/temp
 ```
-
-### 2.2 关于 swap 空间扩容
-
-以前装Linux服务器系统的时候，系统有2G内存，swap交换分区分了2G，现在系统内存加到了4G，建议增加交换分区。
-
-下面把增加 4G swap 分区介绍一下（添加一个交换文件方式）：
-
-1. 查看swap 空间大小(总计)：我的已经加完了，引用另外一台机子的查看内容。
-
-    ```shell
-    free -m
-    #             total       used       free     shared    buffers     cached
-    #Mem:          7985        756       7228          0         98        263
-    #-/+ buffers/cache:        394       7590
-    #Swap:         8189          0       8189
-    ```
-
-2. 增加 4G 的交换空间
-
-    ```shell
-    dd if=/dev/zero of=/usr/swap bs=1024 count=4096000   #/usr/swap 文件在的位置
-    ```
-
-    如果是增加2G，则 count=2048000
-
-    ```shell
-    # 设置交换分区
-    mkswap /usr/swap
-
-    # 启动交换分区
-    swapon /usr/swap
-
-    #此时Top命令看到交换分区增加了，此时重启后发现 swap空间又变回2G了，怎么办呢？又查了下内容发现还有一步。
-
-    # 修改/etc/fstab文件，使得新加的16G交换空间在系统重新启动后自动生效在文件最后加入：
-    vi /etc/fstab 增加下列内容 i进入修改模式
-    #    /usr/swap  swap      swap defaults 0 0
-
-    # free -m 查看swap分区大小
-    ```
 
 ## 3 安装 Oracle JDK
 
@@ -969,24 +929,24 @@ mkdir -p /home/oracle/new-disk-1/ouafhome_1/log
 
 选择 3，根据提示按下表配置。
 
-|                               Menu Option | Name Used in Documentation | Customer Install Value                    |
-| ----------------------------------------: | -------------------------- | ----------------------------------------- |
-|                           Web Server Host | WEB_WLHOST                 | ol7gui                                    |
-|                  Weblogic SSL Port Number | WEB_WLSSLPORT              | 6501                                      |
-|              Weblogic Console Port Number | WLS_ADMIN_PORT             | 6500                                      |
-|        Weblogic Additional Stop Arguments | ADDITIONAL_STOP_WEBLOGIC   | -                                         |
-|                          Web Context Root | WEB_CONTEXT_ROOT           | ouaf                                      |
-|                     WebLogic JNDI User ID | WEB_WLSYSUSER              | Admin [ 这里要的是 LDAP 账户 ]            |
-|                    WebLogic JNDI Password | WEB_WLSYSPASS              | ouafadmin                                 |
-|             WebLogic Admin System User ID | WLS_WEB_WLSYSUSER          | system [ 必须填这个，否则启动报用户错误 ] |
-|            WebLogic Admin System Password | WLS_WEB_WLSYSPASS          | ouafadmin [ 必须填这个 ]                  |
-|                      WebLogic Server Name | WEB_WLS_SVRNAME            | myserver                                  |
-|               Web Server Application Name | WEB_APP                    | SPLWeb                                    |
-|                Deploy Using Archive Files | WEB_DEPLOY_EAR             | false [ 生产环境用 true ]                 |
-|          Deploy Application Viewer Module | WEB_DEPLOY_APPVIEWER       | true [ 生产环境用 false ]                 |
-| Enable The Unsecured Health Check Service | WEB_ENABLE_HEALTHCHECK     | false                                     |
-|                         MDB RunAs User ID | WEB_IWS_MDB_RUNAS_USER     | [ 留空 ]                                  |
-|                            Super User Ids | WEB_IWS_SUPER_USERS        | SYSUSER [ 必须填这个 ]                    |
+|                               Menu Option | Name Used in Documentation | Customer Install Value                        |
+| ----------------------------------------: | -------------------------- | --------------------------------------------- |
+|                           Web Server Host | WEB_WLHOST                 | ol7gui                                        |
+|                  Weblogic SSL Port Number | WEB_WLSSLPORT              | 6501                                          |
+|              Weblogic Console Port Number | WLS_ADMIN_PORT             | 6500                                          |
+|        Weblogic Additional Stop Arguments | ADDITIONAL_STOP_WEBLOGIC   | -                                             |
+|                          Web Context Root | WEB_CONTEXT_ROOT           | ouaf                                          |
+|                     WebLogic JNDI User ID | WEB_WLSYSUSER              | system [ 这里要的是 LDAP 账户，不确认对不对 ] |
+|                    WebLogic JNDI Password | WEB_WLSYSPASS              | ouafadmin                                     |
+|             WebLogic Admin System User ID | WLS_WEB_WLSYSUSER          | system [ 必须填这个，否则启动报用户错误 ]     |
+|            WebLogic Admin System Password | WLS_WEB_WLSYSPASS          | ouafadmin [ 必须填这个 ]                      |
+|                      WebLogic Server Name | WEB_WLS_SVRNAME            | myserver                                      |
+|               Web Server Application Name | WEB_APP                    | SPLWeb                                        |
+|                Deploy Using Archive Files | WEB_DEPLOY_EAR             | false [ 生产环境用 true ]                     |
+|          Deploy Application Viewer Module | WEB_DEPLOY_APPVIEWER       | true [ 生产环境用 false ]                     |
+| Enable The Unsecured Health Check Service | WEB_ENABLE_HEALTHCHECK     | false                                         |
+|                         MDB RunAs User ID | WEB_IWS_MDB_RUNAS_USER     | [ 留空 ]                                      |
+|                            Super User Ids | WEB_IWS_SUPER_USERS        | SYSUSER [ 必须填这个 ]                        |
 
 选择 4，根据提示按下表配置。
 
@@ -1237,7 +1197,47 @@ $SPLEBASE/bin/spl.sh start
 > 找到一篇 Oracle CCB 的安装文字，虽不是同样应用，但都基于 OUAF，也可以借鉴参考。
 > https://ccb2501.blogspot.com/2015/11/step-by-step-install-oracle-utilities.html
 
-### 8.2 磁盘空间不够增加磁盘
+### 8.2 关于 swap 空间扩容
+
+以前装Linux服务器系统的时候，系统有2G内存，swap交换分区分了2G，现在系统内存加到了4G，建议增加交换分区。
+
+下面把增加 4G swap 分区介绍一下（添加一个交换文件方式）：
+
+1. 查看swap 空间大小(总计)：我的已经加完了，引用另外一台机子的查看内容。
+
+    ```shell
+    free -m
+    #             total       used       free     shared    buffers     cached
+    #Mem:          7985        756       7228          0         98        263
+    #-/+ buffers/cache:        394       7590
+    #Swap:         8189          0       8189
+    ```
+
+2. 增加 4G 的交换空间
+
+    ```shell
+    dd if=/dev/zero of=/usr/swap bs=1024 count=4096000   #/usr/swap 文件在的位置
+    ```
+
+    如果是增加2G，则 count=2048000
+
+    ```shell
+    # 设置交换分区
+    mkswap /usr/swap
+
+    # 启动交换分区
+    swapon /usr/swap
+
+    #此时Top命令看到交换分区增加了，此时重启后发现 swap空间又变回2G了，怎么办呢？又查了下内容发现还有一步。
+
+    # 修改/etc/fstab文件，使得新加的16G交换空间在系统重新启动后自动生效在文件最后加入：
+    vi /etc/fstab 增加下列内容 i进入修改模式
+    #    /usr/swap  swap      swap defaults 0 0
+
+    # free -m 查看swap分区大小
+    ```
+
+### 8.3 磁盘空间不够增加磁盘
 
 当需要在虚拟机中增加磁盘时。
 
@@ -1310,7 +1310,7 @@ vim /etc/fstab
 chown <用户名> /home/<用户名>/disk2
 ```
 
-### 8.3 查找大文件和清理大文件
+### 8.4 查找大文件和清理大文件
 
 - Linux 桌面环境回收站中的文件可以清理
 - yum 缓存是可以清理的 `yum clean all`
