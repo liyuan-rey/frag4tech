@@ -169,10 +169,9 @@ ll /etc/rc.local    # 检查
 sudo chmod -c +x /etc/rc.local
 ```
 
+### 杂项
 
-############################
-
-##### 优化（未确认）
+#### 优化（未确认）
 
 Optimize TCP Connection
 
@@ -212,9 +211,9 @@ net.ipv4.ip_local_port_range = 10000 65000
 net.ipv4.tcp_max_syn_backlog = 8192
 # max timewait sockets held by system simultaneously
 net.ipv4.tcp_max_tw_buckets = 5000
-# 
+#
 net.ipv4.tcp_fastopen = 3
-# 
+#
 net.ipv4.tcp_mem = 25600 51200 102400
 # TCP receive buffer
 net.ipv4.tcp_rmem = 4096 87380 67108864
@@ -232,7 +231,7 @@ Reload configuration and set Shadowsocks launch params `fast_open: true`:
 sudo sysctl -p
 ```
 
-##### 控制脚本（）
+#### 控制脚本（未验证）
 
 ```bash
 #!/bin/bash
