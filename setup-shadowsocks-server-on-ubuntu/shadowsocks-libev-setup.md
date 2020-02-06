@@ -26,14 +26,13 @@ sudo vim /etc/shadowsocks-libev/config.json
 
 ```json
 {
-    "server": "my_server_ip",
+    "server": "<my_server_ip>",
     "server_port": 26685,
     "local_address": "127.0.0.1",
-    "local_port": 1080,
-    "password": "mypassword",
+    "local_port": 8388,
+    "password": "<my_password>",
     "timeout": 60,
-    "method": "chacha20-ietf-poly1305",
-    "fast_open": false
+    "method": "chacha20-ietf-poly1305"
 }
 ```
 

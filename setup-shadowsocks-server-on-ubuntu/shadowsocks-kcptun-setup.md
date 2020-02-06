@@ -10,23 +10,23 @@
 
 ## kcptun 服务端
 
-在 https://github.com/xtaci/kcptun/releases 下载 Ubuntu x64 对应的 kcptun，如 `kcptun-linux-amd64-20180305.tar.gz`。
+在 https://github.com/xtaci/kcptun/releases 下载 Ubuntu x64 对应的 kcptun，如 `kcptun-linux-amd64-20200201.tar.gz`。
 
 ```shell
 cd ~
-curl -OL https://github.com/xtaci/kcptun/releases/download/v20180305/kcptun-linux-amd64-20180305.tar.gz
+curl -OL https://github.com/xtaci/kcptun/releases/download/v20200201/kcptun-linux-amd64-20200201.tar.gz
 ```
 
 解压缩
 
 ```shell
-tar -zxf kcptun-linux-amd64-20180305.tar.gz
+tar -zxf kcptun-linux-amd64-20200201.tar.gz
 ```
 
 解压后有 `server_linux_amd64` 和 `client_linux_amd64` 两个文件，其中 `server_linux_amd64` 是 Linux 服务端需要的。为方便使用，我们将它移动并改名。
 
 ```shell
-mv server_linux_amd64 /usr/local/bin/kcptun_server
+mv server_linux_amd64 /usr/bin/kcptun-server
 ```
 
 创建启动参数配置文件。
@@ -40,9 +40,9 @@ touch /etc/kcptun/config.json
 
 ```json
 {
-  "listen": ":29900",
-  "target": "127.0.0.1:8388",
-  "key": "test",
+  "listen": ":26900",
+  "target": "<my_server_ip>:26685",
+  "key": "<pwd>",
   "crypt": "salsa20",
   "mode": "fast2",
   "mtu": 1400,
