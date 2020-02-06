@@ -68,44 +68,44 @@
 
 1. 安装好系统后的一个好习惯是更新软件包到最新版本。
 
-    用 root 运行。
+   用 root 运行。
 
-    ```shell
-    sudo yum -y update
-    ```
+   ```shell
+   sudo yum -y update
+   ```
 
-    注意看 yum 的升级提示，可能需要调整 oracle linux 官方包源配置
+   注意看 yum 的升级提示，可能需要调整 oracle linux 官方包源配置
 
-    ```shell
-    # 可选
-    sudo /usr/bin/ol_yum_configure.sh
-    ```
+   ```shell
+   # 可选
+   sudo /usr/bin/ol_yum_configure.sh
+   ```
 
 1. 修改主机名和 IP 解析记录，我用的是 `ol7gui`。
 
-    ```shell
-    # 修改主机名，将 hostname 文件内容修改为 ol7gui
-    vim /etc/hostname
-    # 增加 IP 解析记录，在 hosts 文末增加一行如 “192.168.126.133   ol7gui”
-    vim /etc/hosts
-    ```
+   ```shell
+   # 修改主机名，将 hostname 文件内容修改为 ol7gui
+   vim /etc/hostname
+   # 增加 IP 解析记录，在 hosts 文末增加一行如 “192.168.126.133   ol7gui”
+   vim /etc/hosts
+   ```
 
 1. `SELinux` 和 `firewalld`
 
-    理论上并不需要停用 `SELinux` 或者 `firewalld`。
+   理论上并不需要停用 `SELinux` 或者 `firewalld`。
 
-    如果一定想要关闭，可以参考下面的步骤。
+   如果一定想要关闭，可以参考下面的步骤。
 
-    用 root 用户运行。
+   用 root 用户运行。
 
-    ```shell
-    sed -i s#SELINUX=enforcing#SELINUX=disabled#g /etc/selinux/config
-    setenforce 0
-    egrep "SELINUX=disabled" /etc/selinux/config
-    getenforce
-    systemctl stop firewalld.service
-    systemctl disable firewalld.service
-    ```
+   ```shell
+   sed -i s#SELINUX=enforcing#SELINUX=disabled#g /etc/selinux/config
+   setenforce 0
+   egrep "SELINUX=disabled" /etc/selinux/config
+   getenforce
+   systemctl stop firewalld.service
+   systemctl disable firewalld.service
+   ```
 
 > **特别注意，后续安装软件时，指定路径都不要有空格。**
 
@@ -170,161 +170,161 @@ javac
 
 1. 查找 OpenJDK 目录
 
-    ```shell
-    which java
-    #/usr/bin/java
-    ls -lrt /usr/bin/java
-    #lrwxrwxrwx. 1 root root 22 Sep  1 22:28 /usr/bin/java -> /etc/alternatives/java
-    ls -lrt /etc/alternatives/java
-    #lrwxrwxrwx. 1 root root 73 Sep  1 22:28 /etc/alternatives/java -> /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.el7_6.x86_64/jre/bin/java
-    ```
+   ```shell
+   which java
+   #/usr/bin/java
+   ls -lrt /usr/bin/java
+   #lrwxrwxrwx. 1 root root 22 Sep  1 22:28 /usr/bin/java -> /etc/alternatives/java
+   ls -lrt /etc/alternatives/java
+   #lrwxrwxrwx. 1 root root 73 Sep  1 22:28 /etc/alternatives/java -> /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.el7_6.x86_64/jre/bin/java
+   ```
 
-    这里的 "/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.el7_6.x86_64" 就是 OpenJDK 安装路径。
+   这里的 "/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.el7_6.x86_64" 就是 OpenJDK 安装路径。
 
 1. 设置 OpenJDK 环境变量
 
-    以 root 用户编辑文件。
+   以 root 用户编辑文件。
 
-    ```shell
-    vim /etc/profile
-    ```
+   ```shell
+   vim /etc/profile
+   ```
 
-    添加这些命令在文件末尾。
+   添加这些命令在文件末尾。
 
-    ```shell
-    export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.el7_6.x86_64
-    export JRE_HOME=${JAVA_HOME}/jre
-    export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib:$CLASSPATH
-    export JAVA_PATH=${JAVA_HOME}/bin:${JRE_HOME}/bin
-    export PATH=$PATH:${JAVA_PATH}
-    ```
+   ```shell
+   export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.el7_6.x86_64
+   export JRE_HOME=${JAVA_HOME}/jre
+   export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib:$CLASSPATH
+   export JAVA_PATH=${JAVA_HOME}/bin:${JRE_HOME}/bin
+   export PATH=$PATH:${JAVA_PATH}
+   ```
 
-    保存并退出编辑器，然后使配置生效。
+   保存并退出编辑器，然后使配置生效。
 
-    ```shell
-    source /etc/profile
-    ```
+   ```shell
+   source /etc/profile
+   ```
 
 ## 4 Oracle Database
 
 1. 使用 Oracle Database 12c 预配置包
 
-    以 root 运行 Oracle Database 12c 预配置包，它可以自动安装缺失的包、自动配置 Linux 核心参数及自动创建标准安装所需要的用户及用户组。
+   以 root 运行 Oracle Database 12c 预配置包，它可以自动安装缺失的包、自动配置 Linux 核心参数及自动创建标准安装所需要的用户及用户组。
 
-    参考：https://docs.oracle.com/en/database/oracle/oracle-database/12.2/ladbi/installing-the-oracle-preinstallation-rpm-from-unbreakable-linux-network.html
+   参考：https://docs.oracle.com/en/database/oracle/oracle-database/12.2/ladbi/installing-the-oracle-preinstallation-rpm-from-unbreakable-linux-network.html
 
-    ```shell
-    yum install oracle-database-server-12cR2-preinstall
-    ```
+   ```shell
+   yum install oracle-database-server-12cR2-preinstall
+   ```
 
-    以 root 运行下面命令，检查核心参数是否正确创建。
+   以 root 运行下面命令，检查核心参数是否正确创建。
 
-    ```shell
-    sysctl -p
-    ```
+   ```shell
+   sysctl -p
+   ```
 
-    自动创建的 `oracle` 用户默认密码为空，需要为 `oracle` 用户设置密码，以便能进行 SSH 远程登录及操作。
+   自动创建的 `oracle` 用户默认密码为空，需要为 `oracle` 用户设置密码，以便能进行 SSH 远程登录及操作。
 
-    ```shell
-    passwd oracle
-    ```
+   ```shell
+   passwd oracle
+   ```
 
-    重启一次操作系统，以使一些配置生效。
+   重启一次操作系统，以使一些配置生效。
 
 1. 启动图形化安装程序
 
-    使用上一步自动创建的 `oracle` 用户登录桌面。
+   使用上一步自动创建的 `oracle` 用户登录桌面。
 
-    解压缩。
+   解压缩。
 
-    ```shell
-    unzip oracle_linuxx64_12201_database.zip
-    ```
+   ```shell
+   unzip oracle_linuxx64_12201_database.zip
+   ```
 
-    启动图形化安装。
+   启动图形化安装。
 
-    ```shell
-    ./database/runInstaller
-    ```
+   ```shell
+   ./database/runInstaller
+   ```
 
-    其中的选项如下：
+   其中的选项如下：
 
-    - "Create and configure a database"
-    - "Server class"
-    - "Single instance database installation" (Oracle RAC One Node Database installation 是否更具后续扩展的灵活性？)
-    - "Advanced install"
-    - "Enterprise Edition (7.5GB)"
-    - 默认安装位置 Oracle base: "/home/oracle/app/oracle" Software location: "/home/oracle/app/oracle/product/12.2.0/dbhome_1"
-    - Inventory Directory: "/home/oracle/app/oraInventory"; oraInventory Group Name: "oinstall";"General Purpose / Transaction Processing"
-    - Global database name: "orcl", Oracle system identifier (SID): "orcl", Create as Container database - checked,
-    - Pluggable database name: "orclpdb"
-    - Enable Automatic Memory Management , Character sets "Use Unicode (AL32UTF8", no sample schemas
-    - "File system", Specify database file location: "/home/oracle/app/oracle/oradata"
-       提示数据文件至少需要 12,130MB 空间不够。为了避免重装，我把它重新指向 "/home/oracle/new-disk-1/app/oracle/oradata"
-    - 未加入 Enterprise Management (EM) Cloud Control
-    - 未启用 "Enable Recovery"
-    - "Use the same password for all accounts" - sysadm
-    - Operating System Groups: 全默认
+   - "Create and configure a database"
+   - "Server class"
+   - "Single instance database installation" (Oracle RAC One Node Database installation 是否更具后续扩展的灵活性？)
+   - "Advanced install"
+   - "Enterprise Edition (7.5GB)"
+   - 默认安装位置 Oracle base: "/home/oracle/app/oracle" Software location: "/home/oracle/app/oracle/product/12.2.0/dbhome_1"
+   - Inventory Directory: "/home/oracle/app/oraInventory"; oraInventory Group Name: "oinstall";"General Purpose / Transaction Processing"
+   - Global database name: "orcl", Oracle system identifier (SID): "orcl", Create as Container database - checked,
+   - Pluggable database name: "orclpdb"
+   - Enable Automatic Memory Management , Character sets "Use Unicode (AL32UTF8", no sample schemas
+   - "File system", Specify database file location: "/home/oracle/app/oracle/oradata"
+     提示数据文件至少需要 12,130MB 空间不够。为了避免重装，我把它重新指向 "/home/oracle/new-disk-1/app/oracle/oradata"
+   - 未加入 Enterprise Management (EM) Cloud Control
+   - 未启用 "Enable Recovery"
+   - "Use the same password for all accounts" - sysadm
+   - Operating System Groups: 全默认
 
-    > 注意：“Create as Container database” 这种数据库类型比较复杂，根据后面的 PSRM 安装，感觉可以不要选这个选项；如果不选，“Pluggable database name” 就不再需要配置了。
+   > 注意：“Create as Container database” 这种数据库类型比较复杂，根据后面的 PSRM 安装，感觉可以不要选这个选项；如果不选，“Pluggable database name” 就不再需要配置了。
 
-    由于使用了预配置包，prerequisite 的绝大部分要求应该都已经满足。
+   由于使用了预配置包，prerequisite 的绝大部分要求应该都已经满足。
 
-    我安装时有两个问题：
+   我安装时有两个问题：
 
-    - 一个 soft max stack size 不够，看了一下预配置包已经修改了相关配置了，不知道为什么没起作用，问题不大所以忽略了。
-    - 一个 swap 空间不足的问题，是因为我把虚拟机内存从 2G 加到 3G 但没改 swap 大小，懒得再做调整所以直接强制忽略了。
+   - 一个 soft max stack size 不够，看了一下预配置包已经修改了相关配置了，不知道为什么没起作用，问题不大所以忽略了。
+   - 一个 swap 空间不足的问题，是因为我把虚拟机内存从 2G 加到 3G 但没改 swap 大小，懒得再做调整所以直接强制忽略了。
 
-    开始正式安装过程。其中提示以 root 运行两个脚本 “/home/oracle/app/oraInventory/orainstRoot.sh” “/home/oracle/app/oracle/product/12.2.0/dbhome_1/root.sh”，不要关闭提示框，打开控制台以 root 身份按顺序运行这两个脚本。脚本运行中提示 bin directory 时使用默认的 “/usr/local/bin”，提示配置 TFA 时输入 “no”。
+   开始正式安装过程。其中提示以 root 运行两个脚本 “/home/oracle/app/oraInventory/orainstRoot.sh” “/home/oracle/app/oracle/product/12.2.0/dbhome_1/root.sh”，不要关闭提示框，打开控制台以 root 身份按顺序运行这两个脚本。脚本运行中提示 bin directory 时使用默认的 “/usr/local/bin”，提示配置 TFA 时输入 “no”。
 
-    要等一段时间才会安装并创建实例完成。（我的笔记本大概跑了几十分钟，中途可以切个控制台出来 `top` 指令看看有没有假死。）
+   要等一段时间才会安装并创建实例完成。（我的笔记本大概跑了几十分钟，中途可以切个控制台出来 `top` 指令看看有没有假死。）
 
 1. 设置环境变量
 
-    用 `oracle` 账户继续运行。
+   用 `oracle` 账户继续运行。
 
-    ```shell
-    vim /home/oracle/.bash_profile
-    ```
+   ```shell
+   vim /home/oracle/.bash_profile
+   ```
 
-    在文件末尾添加。
+   在文件末尾添加。
 
-    ```shell
-    export ORACLE_SID=orcl
-    export ORACLE_BASE=/home/oracle/database
-    export ORACLE_HOME=$ORACLE_BASE/product/12c/db_1
-    export PATH=${PATH}:${ORACLE_HOME}/bin/;
-    ```
+   ```shell
+   export ORACLE_SID=orcl
+   export ORACLE_BASE=/home/oracle/database
+   export ORACLE_HOME=$ORACLE_BASE/product/12c/db_1
+   export PATH=${PATH}:${ORACLE_HOME}/bin/;
+   ```
 
-    使配置生效。
+   使配置生效。
 
-    ```shell
-    source /home/oracle/.bash_profile
-    ```
+   ```shell
+   source /home/oracle/.bash_profile
+   ```
 
 1. 检查安装结果
 
-    用 `oracle` 账户继续运行。
+   用 `oracle` 账户继续运行。
 
-    ```shell
-    sqlplus /nolog
-    ```
+   ```shell
+   sqlplus /nolog
+   ```
 
-    然后在 `Sql>` 提示符下输入。
+   然后在 `Sql>` 提示符下输入。
 
-    ```sql
-    conn sys/sysadm as sysdba
-    /*connected to an idle instance.*/
-    STARTUP; -- 启动数据库，注意加分号
-    --SHUTDOWN; -- 关闭数据库
-    ```
+   ```sql
+   conn sys/sysadm as sysdba
+   /*connected to an idle instance.*/
+   STARTUP; -- 启动数据库，注意加分号
+   --SHUTDOWN; -- 关闭数据库
+   ```
 
-    启动 Listener
+   启动 Listener
 
-    ```shell
-    lsnrctl start
-    #lsnrctl stop
-    ```
+   ```shell
+   lsnrctl start
+   #lsnrctl stop
+   ```
 
 ### 4.1 关于先安装数据库软件，后创建数据库
 
@@ -472,7 +472,7 @@ PSRM 软件自身需要安装的内容：
 > 后面 PSRM 安装时需要 Oracle Database 或者 Client 路径里的 Perl。
 > 本文主要是以都装在同一台机器上举例。
 
-如果不是在Oracle Database 的机器上装 WebLogic 和 PSRM，那么就需要装 Client 安装包。
+如果不是在 Oracle Database 的机器上装 WebLogic 和 PSRM，那么就需要装 Client 安装包。
 
 执行安装程序。
 
@@ -830,7 +830,7 @@ SQL> conn sys/sysadm@ol7gui:1521/orcl as sysdba
 grant execute on USER_LOCK to public;
 ```
 
-可以用 sqlplus 下面语句查询数据库 CIS* 对象，有助于确认是否正确创建了数据库结构。
+可以用 sqlplus 下面语句查询数据库 `CIS*` 对象，有助于确认是否正确创建了数据库结构。
 如果 STATUS 里有 Invalid 字样要注意。
 
 ```sql
@@ -868,7 +868,7 @@ cd FW-V4.3.0.4.0-SP4/
 |              Oracle Client Home Directory | ORACLE_CLIENT_HOME         | /home/oracle/app/oracle/product/12.2.0/clienthome_1                                           |
 |                   Web Java Home Directory | JAVA_HOME                  | /usr/java/jdk1.8.0_221                                                                        |
 |                   Hibernate JAR Directory | HIBERNATE_JAR_DIR          | /home/oracle/lib/hibernate/mixed-for-psrm-2.5.0.1                                             |
-|                       **ONS JAR Directory | ONS_JAR_DIR                | [ 留空，参考地址：/home/oracle/app/oracle/product/12.2.0/dbhome_1/opmn/lib ]                  |
+|                      ** ONS JAR Directory | ONS_JAR_DIR                | [ 留空，参考地址：/home/oracle/app/oracle/product/12.2.0/dbhome_1/opmn/lib ]                  |
 |     Web Application Server Home Directory | WEB_SERVER_HOME            | /home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home/wlserver                                |
 | WebLogic Server Thin-Client JAR Directory | WLTHINT3CLIENT_JAR_DIR     | [ 留空，参考地址：/home/oracle/new-disk-1/Oracle/Middleware/Oracle_Home/wlserver/server/lib ] |
 |                      * ADF Home Directory | ADF_HOME                   | [ 按 Enter 直接使用默认值，可以留空 ]                                                         |
@@ -1199,43 +1199,43 @@ $SPLEBASE/bin/spl.sh start
 
 ### 8.2 关于 swap 空间扩容
 
-以前装Linux服务器系统的时候，系统有2G内存，swap交换分区分了2G，现在系统内存加到了4G，建议增加交换分区。
+以前装 Linux 服务器系统的时候，系统有 2G 内存，swap 交换分区分了 2G，现在系统内存加到了 4G，建议增加交换分区。
 
 下面把增加 4G swap 分区介绍一下（添加一个交换文件方式）：
 
-1. 查看swap 空间大小(总计)：我的已经加完了，引用另外一台机子的查看内容。
+1. 查看 swap 空间大小(总计)：我的已经加完了，引用另外一台机子的查看内容。
 
-    ```shell
-    free -m
-    #             total       used       free     shared    buffers     cached
-    #Mem:          7985        756       7228          0         98        263
-    #-/+ buffers/cache:        394       7590
-    #Swap:         8189          0       8189
-    ```
+   ```shell
+   free -m
+   #             total       used       free     shared    buffers     cached
+   #Mem:          7985        756       7228          0         98        263
+   #-/+ buffers/cache:        394       7590
+   #Swap:         8189          0       8189
+   ```
 
 2. 增加 4G 的交换空间
 
-    ```shell
-    dd if=/dev/zero of=/usr/swap bs=1024 count=4096000   #/usr/swap 文件在的位置
-    ```
+   ```shell
+   dd if=/dev/zero of=/usr/swap bs=1024 count=4096000   #/usr/swap 文件在的位置
+   ```
 
-    如果是增加2G，则 count=2048000
+   如果是增加 2G，则 count=2048000
 
-    ```shell
-    # 设置交换分区
-    mkswap /usr/swap
+   ```shell
+   # 设置交换分区
+   mkswap /usr/swap
 
-    # 启动交换分区
-    swapon /usr/swap
+   # 启动交换分区
+   swapon /usr/swap
 
-    #此时Top命令看到交换分区增加了，此时重启后发现 swap空间又变回2G了，怎么办呢？又查了下内容发现还有一步。
+   #此时Top命令看到交换分区增加了，此时重启后发现 swap空间又变回2G了，怎么办呢？又查了下内容发现还有一步。
 
-    # 修改/etc/fstab文件，使得新加的16G交换空间在系统重新启动后自动生效在文件最后加入：
-    vi /etc/fstab 增加下列内容 i进入修改模式
-    #    /usr/swap  swap      swap defaults 0 0
+   # 修改/etc/fstab文件，使得新加的16G交换空间在系统重新启动后自动生效在文件最后加入：
+   vi /etc/fstab 增加下列内容 i进入修改模式
+   #    /usr/swap  swap      swap defaults 0 0
 
-    # free -m 查看swap分区大小
-    ```
+   # free -m 查看swap分区大小
+   ```
 
 ### 8.3 磁盘空间不够增加磁盘
 
@@ -1357,7 +1357,7 @@ else
 如果用 `$SPLEBASE/bin/configureEnv.sh` 脚本做配置时，没有对 `WebLogic Admin System User ID` 和 `WebLogic Admin System Password` 配置项使用默认账户信息 `system/ouafadmin` 就会报以下错误。
 
 ```plain
-<Sep 10, 2019 8:34:15,276 PM GMT> <Critical> <Security> <BEA-090402> <Authentication denied: Boot identity not valid. The user name or password or both from the boot identity file (boot.properties) is not valid. The boot identity may have been changed since the boot identity file was created. Please edit and update the boot identity file with the proper values of username and password. The first time the updated boot identity file is used to start the server, these new values are encrypted.> 
+<Sep 10, 2019 8:34:15,276 PM GMT> <Critical> <Security> <BEA-090402> <Authentication denied: Boot identity not valid. The user name or password or both from the boot identity file (boot.properties) is not valid. The boot identity may have been changed since the boot identity file was created. Please edit and update the boot identity file with the proper values of username and password. The first time the updated boot identity file is used to start the server, these new values are encrypted.>
 <Sep 10, 2019 8:34:15,313 PM GMT> <Critical> <WebLogicServer> <BEA-000386> <Server subsystem failed. Reason: A MultiException has 6 exceptions.  They are:
 1. weblogic.security.SecurityInitializationException: Authentication denied: Boot identity not valid. The user name or password or both from the boot identity file (boot.properties) is not valid. The boot identity may have been changed since the boot identity file was created. Please edit and update the boot identity file with the proper values of username and password. The first time the updated boot identity file is used to start the server, these new values are encrypted.
 2. java.lang.IllegalStateException: Unable to perform operation: post construct on weblogic.security.SecurityService
@@ -1374,26 +1374,26 @@ A MultiException has 6 exceptions.  They are:
 5. java.lang.IllegalArgumentException: While attempting to resolve the dependencies of weblogic.deployment.DeploymentRegistrationService errors were found
 6. java.lang.IllegalStateException: Unable to perform operation: resolve on weblogic.deployment.DeploymentRegistrationService
 
-	at org.jvnet.hk2.internal.Collector.throwIfErrors(Collector.java:89)
-	at org.jvnet.hk2.internal.ClazzCreator.resolveAllDependencies(ClazzCreator.java:250)
-	at org.jvnet.hk2.internal.ClazzCreator.create(ClazzCreator.java:358)
-	at org.jvnet.hk2.internal.SystemDescriptor.create(SystemDescriptor.java:487)
-	at org.glassfish.hk2.runlevel.internal.AsyncRunLevelContext.findOrCreate(AsyncRunLevelContext.java:305)
-	Truncated. see log file for complete stacktrace
+  at org.jvnet.hk2.internal.Collector.throwIfErrors(Collector.java:89)
+ at org.jvnet.hk2.internal.ClazzCreator.resolveAllDependencies(ClazzCreator.java:250)
+  at org.jvnet.hk2.internal.ClazzCreator.create(ClazzCreator.java:358)
+  at org.jvnet.hk2.internal.SystemDescriptor.create(SystemDescriptor.java:487)
+ at org.glassfish.hk2.runlevel.internal.AsyncRunLevelContext.findOrCreate(AsyncRunLevelContext.java:305)
+  Truncated. see log file for complete stacktrace
 Caused By: weblogic.security.SecurityInitializationException: Authentication denied: Boot identity not valid. The user name or password or both from the boot identity file (boot.properties) is not valid. The boot identity may have been changed since the boot identity file was created. Please edit and update the boot identity file with the proper values of username and password. The first time the updated boot identity file is used to start the server, these new values are encrypted.
-	at weblogic.security.service.CommonSecurityServiceManagerDelegateImpl.doBootAuthorization(CommonSecurityServiceManagerDelegateImpl.java:1152)
-	at weblogic.security.service.CommonSecurityServiceManagerDelegateImpl.postInitialize(CommonSecurityServiceManagerDelegateImpl.java:1272)
-	at weblogic.security.service.SecurityServiceManager.postInitialize(SecurityServiceManager.java:586)
-	at weblogic.security.SecurityService.start(SecurityService.java:130)
-	at weblogic.server.AbstractServerService.postConstruct(AbstractServerService.java:76)
-	Truncated. see log file for complete stacktrace
+  at weblogic.security.service.CommonSecurityServiceManagerDelegateImpl.doBootAuthorization(CommonSecurityServiceManagerDelegateImpl.java:1152)
+  at weblogic.security.service.CommonSecurityServiceManagerDelegateImpl.postInitialize(CommonSecurityServiceManagerDelegateImpl.java:1272)
+  at weblogic.security.service.SecurityServiceManager.postInitialize(SecurityServiceManager.java:586)
+  at weblogic.security.SecurityService.start(SecurityService.java:130)
+  at weblogic.server.AbstractServerService.postConstruct(AbstractServerService.java:76)
+  Truncated. see log file for complete stacktrace
 Caused By: javax.security.auth.login.FailedLoginException: [Security:090938]Authentication failure: The specified user failed to log in. javax.security.auth.login.FailedLoginException: [Security:090302]Authentication Failed: User specified user denied
-	at com.bea.common.security.utils.ExceptionHandler.throwFailedLoginException(ExceptionHandler.java:62)
-	at weblogic.security.providers.authentication.LDAPAtnLoginModuleImpl.login(LDAPAtnLoginModuleImpl.java:380)
-	at com.bea.common.security.internal.service.LoginModuleWrapper$1.run(LoginModuleWrapper.java:117)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at com.bea.common.security.internal.service.LoginModuleWrapper.login(LoginModuleWrapper.java:114)
-	Truncated. see log file for complete stacktrace
+  at com.bea.common.security.utils.ExceptionHandler.throwFailedLoginException(ExceptionHandler.java:62)
+  at weblogic.security.providers.authentication.LDAPAtnLoginModuleImpl.login(LDAPAtnLoginModuleImpl.java:380)
+  at com.bea.common.security.internal.service.LoginModuleWrapper$1.run(LoginModuleWrapper.java:117)
+  at java.security.AccessController.doPrivileged(Native Method)
+  at com.bea.common.security.internal.service.LoginModuleWrapper.login(LoginModuleWrapper.java:114)
+  Truncated. see log file for complete stacktrace
 >
 ```
 
@@ -1405,86 +1405,82 @@ Caused By: javax.security.auth.login.FailedLoginException: [Security:090938]Auth
 
 ### 9.x 现存问题
 
-
 ```plain
-<Sep 16, 2019 12:50:10,806 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192509> <Changing servlet class from com.sun.jersey.spi.container.servlet.ServletContainer (web.xml) to org.glassfish.jersey.servlet.ServletContainer.> 
-<Sep 16, 2019 12:50:10,847 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ResourceConfig because ApplicationPath annotation is not set on it.> 
-<Sep 16, 2019 12:50:10,849 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ApplicationAdapter because ApplicationPath annotation is not set on it.> 
-<Sep 16, 2019 12:50:10,851 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.server.impl.application.DeferredResourceConfig because ApplicationPath annotation is not set on it.> 
-<Sep 16, 2019 12:50:10,852 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ClassNamesResourceConfig because ApplicationPath annotation is not set on it.> 
-<Sep 16, 2019 12:50:10,852 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.DefaultResourceConfig because ApplicationPath annotation is not set on it.> 
-<Sep 16, 2019 12:50:10,855 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.PackagesResourceConfig because ApplicationPath annotation is not set on it.> 
-<Sep 16, 2019 12:50:10,868 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.servlet.WebAppResourceConfig because ApplicationPath annotation is not set on it.> 
-<Sep 16, 2019 12:50:10,870 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ClasspathResourceConfig because ApplicationPath annotation is not set on it.> 
+<Sep 16, 2019 12:50:10,806 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192509> <Changing servlet class from com.sun.jersey.spi.container.servlet.ServletContainer (web.xml) to org.glassfish.jersey.servlet.ServletContainer.>
+<Sep 16, 2019 12:50:10,847 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ResourceConfig because ApplicationPath annotation is not set on it.>
+<Sep 16, 2019 12:50:10,849 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ApplicationAdapter because ApplicationPath annotation is not set on it.>
+<Sep 16, 2019 12:50:10,851 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.server.impl.application.DeferredResourceConfig because ApplicationPath annotation is not set on it.>
+<Sep 16, 2019 12:50:10,852 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ClassNamesResourceConfig because ApplicationPath annotation is not set on it.>
+<Sep 16, 2019 12:50:10,852 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.DefaultResourceConfig because ApplicationPath annotation is not set on it.>
+<Sep 16, 2019 12:50:10,855 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.PackagesResourceConfig because ApplicationPath annotation is not set on it.>
+<Sep 16, 2019 12:50:10,868 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.servlet.WebAppResourceConfig because ApplicationPath annotation is not set on it.>
+<Sep 16, 2019 12:50:10,870 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ClasspathResourceConfig because ApplicationPath annotation is not set on it.>
 <Sep 16, 2019 12:50:10,870 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192510> <Cannot add Jersey servlet for application class com.sun.jersey.api.core.ScanningResourceConfig because ApplicationPath annotation is not set on it.>
 ```
 
-
-
 ```plain
-<Sep 16, 2019 12:50:13,318 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192511> <The list of resource packages: com.splwg.base.web.rest> 
-<Sep 16, 2019 12:50:22,532 PM GMT> <Warning> <HTTP> <BEA-101403> <For security constraint with url-pattern /* in web application XAIApp, only the http methods "TRACE DELETE OPTIONS PUT " are covered.> 
-<Sep 16, 2019 12:50:32,606 PM GMT> <Warning> <HTTP> <BEA-101304> <Web application: ServletContext@1934954330[app:XAIApp module:XAIApp path:null spec-version:3.1], the role: ** defined in web.xml has not been mapped to principals in security-role-assignment in weblogic.xml. Will use the rolename itself as the principal-name.> 
-<Sep 16, 2019 12:50:32,597 PM GMT> <Warning> <HTTP> <BEA-101403> <For security constraint with url-pattern /* in web application XAIApp, only the http methods "TRACE DELETE OPTIONS PUT " are covered.> 
-<Sep 16, 2019 12:50:32,606 PM GMT> <Warning> <HTTP> <BEA-101304> <Web application: ServletContext@1934954330[app:XAIApp module:XAIApp path:null spec-version:3.1], the role: ** defined in web.xml has not been mapped to principals in security-role-assignment in weblogic.xml. Will use the rolename itself as the principal-name.> 
+<Sep 16, 2019 12:50:13,318 PM GMT> <Warning> <JAXRSIntegration> <BEA-2192511> <The list of resource packages: com.splwg.base.web.rest>
+<Sep 16, 2019 12:50:22,532 PM GMT> <Warning> <HTTP> <BEA-101403> <For security constraint with url-pattern /* in web application XAIApp, only the http methods "TRACE DELETE OPTIONS PUT " are covered.>
+<Sep 16, 2019 12:50:32,606 PM GMT> <Warning> <HTTP> <BEA-101304> <Web application: ServletContext@1934954330[app:XAIApp module:XAIApp path:null spec-version:3.1], the role: ** defined in web.xml has not been mapped to principals in security-role-assignment in weblogic.xml. Will use the rolename itself as the principal-name.>
+<Sep 16, 2019 12:50:32,597 PM GMT> <Warning> <HTTP> <BEA-101403> <For security constraint with url-pattern /* in web application XAIApp, only the http methods "TRACE DELETE OPTIONS PUT " are covered.>
+<Sep 16, 2019 12:50:32,606 PM GMT> <Warning> <HTTP> <BEA-101304> <Web application: ServletContext@1934954330[app:XAIApp module:XAIApp path:null spec-version:3.1], the role: ** defined in web.xml has not been mapped to principals in security-role-assignment in weblogic.xml. Will use the rolename itself as the principal-name.>
 java.lang.NoClassDefFoundError: oracle/adf/share/logging/handler/InternalADFHandler
 
-<Sep 16, 2019 12:50:37,559 PM GMT> <Warning> <HTTP> <BEA-101304> <Web application: ServletContext@633017488[app:ohelp module:ohelp path:null spec-version:3.1], the role: ** defined in web.xml has not been mapped to principals in security-role-assignment in weblogic.xml. Will use the rolename itself as the principal-name.> 
+<Sep 16, 2019 12:50:37,559 PM GMT> <Warning> <HTTP> <BEA-101304> <Web application: ServletContext@633017488[app:ohelp module:ohelp path:null spec-version:3.1], the role: ** defined in web.xml has not been mapped to principals in security-role-assignment in weblogic.xml. Will use the rolename itself as the principal-name.>
 
 <Sep 16, 2019 12:50:37,590 PM GMT> <Error> <HTTP> <BEA-101165> <Could not load user defined filter in web.xml: oracle.adf.view.rich.webapp.AdfFacesCachingFilter.
 java.lang.NoClassDefFoundError: Could not initialize class oracle.adf.share.ADFContext
-	at oracle.adfinternal.view.faces.caching.filter.AdfFacesCachingFilterImpl.init(AdfFacesCachingFilterImpl.java:85)
-	at oracle.adf.view.rich.webapp.AdfFacesCachingFilter.init(AdfFacesCachingFilter.java:38)
-	at weblogic.servlet.internal.FilterManager$FilterInitAction.run(FilterManager.java:400)
-	at weblogic.security.acl.internal.AuthenticatedSubject.doAs(AuthenticatedSubject.java:326)
-	at weblogic.security.service.SecurityManager.runAsForUserCode(SecurityManager.java:197)
-	Truncated. see log file for complete stacktrace
-> 
+  at oracle.adfinternal.view.faces.caching.filter.AdfFacesCachingFilterImpl.init(AdfFacesCachingFilterImpl.java:85)
+  at oracle.adf.view.rich.webapp.AdfFacesCachingFilter.init(AdfFacesCachingFilter.java:38)
+  at weblogic.servlet.internal.FilterManager$FilterInitAction.run(FilterManager.java:400)
+  at weblogic.security.acl.internal.AuthenticatedSubject.doAs(AuthenticatedSubject.java:326)
+  at weblogic.security.service.SecurityManager.runAsForUserCode(SecurityManager.java:197)
+  Truncated. see log file for complete stacktrace
+>
 ```
 
 ```plain
 <Sep 16, 2019 12:50:39,885 PM GMT> <Warning> <HTTP> <BEA-101162> <User defined listener com.splwg.base.web.startup.SPLWebStartup failed: java.lang.ExceptionInInitializerError.
 java.lang.ExceptionInInitializerError
-	at com.splwg.serviceclient.RemotePageServiceDispatcherHelper.doIt(RemotePageServiceDispatcherHelper.java:17)
-	at com.splwg.serviceclient.RemoteServiceDispatcher.readSystem(RemoteServiceDispatcher.java:42)
-	at com.splwg.base.web.startup.PreloadLoginInfo.getMostPrevalentUserLanguage(PreloadLoginInfo.java:269)
-	at com.splwg.base.web.startup.PreloadLoginInfo.initializeRequestContext(PreloadLoginInfo.java:220)
-	at com.splwg.base.web.startup.PreloadLoginInfo.privateExecute(PreloadLoginInfo.java:70)
-	Truncated. see log file for complete stacktrace
+  at com.splwg.serviceclient.RemotePageServiceDispatcherHelper.doIt(RemotePageServiceDispatcherHelper.java:17)
+  at com.splwg.serviceclient.RemoteServiceDispatcher.readSystem(RemoteServiceDispatcher.java:42)
+  at com.splwg.base.web.startup.PreloadLoginInfo.getMostPrevalentUserLanguage(PreloadLoginInfo.java:269)
+  at com.splwg.base.web.startup.PreloadLoginInfo.initializeRequestContext(PreloadLoginInfo.java:220)
+  at com.splwg.base.web.startup.PreloadLoginInfo.privateExecute(PreloadLoginInfo.java:70)
+  Truncated. see log file for complete stacktrace
 Caused By: com.splwg.shared.common.LoggedException: Unexpected GeneralSecurityException
-	at com.splwg.shared.common.LoggedException.wrap(LoggedException.java:199)
-	at com.splwg.shared.common.LoggedException.wrap(LoggedException.java:87)
-	at com.splwg.shared.common.cryptography.CryptographyInstance.decrypt(CryptographyInstance.java:139)
-	at com.splwg.shared.common.cryptography.CryptographyInstance.decryptIfNeeded(CryptographyInstance.java:67)
-	at com.splwg.shared.common.Cryptography.decryptIfNeeded(Cryptography.java:109)
-	Truncated. see log file for complete stacktrace
+  at com.splwg.shared.common.LoggedException.wrap(LoggedException.java:199)
+  at com.splwg.shared.common.LoggedException.wrap(LoggedException.java:87)
+  at com.splwg.shared.common.cryptography.CryptographyInstance.decrypt(CryptographyInstance.java:139)
+  at com.splwg.shared.common.cryptography.CryptographyInstance.decryptIfNeeded(CryptographyInstance.java:67)
+  at com.splwg.shared.common.Cryptography.decryptIfNeeded(Cryptography.java:109)
+  Truncated. see log file for complete stacktrace
 Caused By: javax.crypto.BadPaddingException: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.
-	at com.sun.crypto.provider.CipherCore.unpad(CipherCore.java:975)
-	at com.sun.crypto.provider.CipherCore.fillOutputBuffer(CipherCore.java:1056)
-	at com.sun.crypto.provider.CipherCore.doFinal(CipherCore.java:853)
-	at com.sun.crypto.provider.AESCipher.engineDoFinal(AESCipher.java:446)
-	at javax.crypto.Cipher.doFinal(Cipher.java:2164)
-	Truncated. see log file for complete stacktrace
+  at com.sun.crypto.provider.CipherCore.unpad(CipherCore.java:975)
+  at com.sun.crypto.provider.CipherCore.fillOutputBuffer(CipherCore.java:1056)
+  at com.sun.crypto.provider.CipherCore.doFinal(CipherCore.java:853)
+  at com.sun.crypto.provider.AESCipher.engineDoFinal(AESCipher.java:446)
+  at javax.crypto.Cipher.doFinal(Cipher.java:2164)
+  Truncated. see log file for complete stacktrace
 >
 
 <Sep 16, 2019 12:50:39,924 PM GMT> <Error> <Deployer> <BEA-149231> <Unable to set the activation state to true for the application "root".
 weblogic.application.ModuleException: javax.crypto.BadPaddingException: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.
-	at weblogic.application.internal.ExtensibleModuleWrapper.start(ExtensibleModuleWrapper.java:140)
-	at weblogic.application.internal.flow.ModuleListenerInvoker.start(ModuleListenerInvoker.java:124)
-	at weblogic.application.internal.flow.ModuleStateDriver$3.next(ModuleStateDriver.java:233)
-	at weblogic.application.internal.flow.ModuleStateDriver$3.next(ModuleStateDriver.java:228)
-	at weblogic.application.utils.StateMachineDriver.nextState(StateMachineDriver.java:45)
-	Truncated. see log file for complete stacktrace
+  at weblogic.application.internal.ExtensibleModuleWrapper.start(ExtensibleModuleWrapper.java:140)
+  at weblogic.application.internal.flow.ModuleListenerInvoker.start(ModuleListenerInvoker.java:124)
+  at weblogic.application.internal.flow.ModuleStateDriver$3.next(ModuleStateDriver.java:233)
+  at weblogic.application.internal.flow.ModuleStateDriver$3.next(ModuleStateDriver.java:228)
+  at weblogic.application.utils.StateMachineDriver.nextState(StateMachineDriver.java:45)
+  Truncated. see log file for complete stacktrace
 Caused By: javax.crypto.BadPaddingException: Given final block not properly padded. Such issues can arise if a bad key is used during decryption.
-	at com.sun.crypto.provider.CipherCore.unpad(CipherCore.java:975)
-	at com.sun.crypto.provider.CipherCore.fillOutputBuffer(CipherCore.java:1056)
-	at com.sun.crypto.provider.CipherCore.doFinal(CipherCore.java:853)
-	at com.sun.crypto.provider.AESCipher.engineDoFinal(AESCipher.java:446)
-	at javax.crypto.Cipher.doFinal(Cipher.java:2164)
-	Truncated. see log file for complete stacktrace
-> 
+  at com.sun.crypto.provider.CipherCore.unpad(CipherCore.java:975)
+  at com.sun.crypto.provider.CipherCore.fillOutputBuffer(CipherCore.java:1056)
+  at com.sun.crypto.provider.CipherCore.doFinal(CipherCore.java:853)
+  at com.sun.crypto.provider.AESCipher.engineDoFinal(AESCipher.java:446)
+  at javax.crypto.Cipher.doFinal(Cipher.java:2164)
+  Truncated. see log file for complete stacktrace
+>
 ```
-
 
 ### 9.x 下面是多次验证后发现不必做的修改，仅作记录
 
@@ -1492,7 +1488,7 @@ Caused By: javax.crypto.BadPaddingException: Given final block not properly padd
 修改了 $SPLEBASE/splapp/setEnv.sh 注释了 CLASSPATH 赋值和导出，因为其调用的 splapp/startWLS.sh 里也做了重复设置。
 ```
 
-修改了 $SPLEBASE/splapp/config.xml 里边感觉是大错特错，下面这段是 `sec:authentication-provider` `sec:cert-path-provider` 改过后的设置。
+修改了 `$SPLEBASE/splapp/config.xml` 里边感觉是大错特错，下面这段是 `sec:authentication-provider` `sec:cert-path-provider` 改过后的设置。
 
 ```xml
     <realm>
