@@ -162,7 +162,6 @@ sudo docker image pull ubuntu:16.04
 
 ubuntu 默认镜像包含 `apt` 工具，但不包含 `nginx`、`git` 等，需要手动安装。
 
-
 首先运行 ubuntu 容器，进入交互模式。
 
 ```shell
@@ -182,4 +181,3 @@ sudo docker run ubuntu bash
 ```
 
 ### Docker 镜像服务
-
