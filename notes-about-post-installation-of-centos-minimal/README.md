@@ -58,9 +58,9 @@ service network restart
 
 ## 安装网络工具包
 
-CentOS 7 Minimal 默认没有安装常用的 `ifconfig` 等网络管理程序，但提供了更强大的替代命令 `ip`。
-
-需要手动安装 `ifconfig` 可以使用下面的命令。
+ CentOS 7 Minimal 默认没有安装常用的 `ifconfig` 等网络管理程序，但提供了更强大的替代命令 `ip`。
+ 
+ 需要手动安装 `ifconfig` 可以使用下面的命令。
 
 ```shell
 yum search ifconfig
@@ -82,15 +82,15 @@ CentOS 默认的 `mirrorlist` 网址内容中已经包含一些国内的镜像�
 
 如果确实想替换成速度更快的指定包源，这里以阿里镜像站为例进行配置：
 
+### CentOS-Base
+
 备份原镜像文件，出错后可以恢复。
 
 ```shell
 mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
 ```
 
-下载新的 CentOS-Base.repo 到 `/etc/yum.repos.d/`。
-
-> 注意用的是 CentOS 7 对应的包源，别弄错了
+下载新的 CentOS-Base.repo 到 `/etc/yum.repos.d/`，注意用的是 CentOS 7 对应的包源，别弄错了
 
 ```shell
 curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
@@ -102,17 +102,38 @@ curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-
 sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo
 ```
 
-备份 EPEL (如有配置其他 epel 源)
+### EPEL
+
+备份 EPEL (如有配置其他epel源)
 
 ```shell
 mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.backup
 mv /etc/yum.repos.d/epel-testing.repo /etc/yum.repos.d/epel-testing.repo.backup
 ```
 
-下载新的 EPEL
+下载新的 EPEL 
 
 ```shell
 curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+```
+
+### docker-ce
+
+```shell
+# step 1: 安装必要的一些系统工具
+sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+# Step 2: 添加软件源信息
+sudo yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+# Step 3
+sudo sed -i 's+download.docker.com+mirrors.aliyun.com/docker-ce+' /etc/yum.repos.d/docker-ce.repo
+```
+
+### PostgreSQL
+
+```shell
+mv /etc/yum.repos.d/pgdg-redhat-all.repo /etc/yum.repos.d/pgdg-redhat-all.repo.backup
+yum install https://mirrors.aliyun.com/postgresql/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+sed -i 's+download.postgresql.org/pub+mirrors.aliyun.com/postgresql+' /etc/yum.repos.d/pgdg-redhat-all.repo
 ```
 
 记得重建缓存。
@@ -141,7 +162,7 @@ Failed to establish a new connection: [Errno -3] Temporary failure in name resol
 解决方法是修改 `/usr/lib/sysctl.d/00-system.conf` 文件，在其中添加。
 
 ```ini
-net.ipv4.ip_forward = 1
+net.ipv4.ip_forward=1
 ```
 
 然后重启网络服务。
