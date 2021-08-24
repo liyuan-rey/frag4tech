@@ -58,7 +58,9 @@ service network restart
 
 ## 安装网络工具包
 
- CentOS Minimal 默认没有安装常用的 `ifconfig` 等网络管理程序，需要手动安装。
+CentOS 7 Minimal 默认没有安装常用的 `ifconfig` 等网络管理程序，但提供了更强大的替代命令 `ip`。
+
+需要手动安装 `ifconfig` 可以使用下面的命令。
 
 ```shell
 yum search ifconfig
@@ -86,11 +88,31 @@ CentOS 默认的 `mirrorlist` 网址内容中已经包含一些国内的镜像�
 mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
 ```
 
-下载新的 CentOS-Base.repo 到 `/etc/yum.repos.d/`
+下载新的 CentOS-Base.repo 到 `/etc/yum.repos.d/`。
+
+> 注意用的是 CentOS 7 对应的包源，别弄错了
 
 ```shell
-yum install wget
-wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+```
+
+非阿里云ECS用户会出现 Couldn't resolve host 'mirrors.cloud.aliyuncs.com' 信息，不影响使用。也可自行修改相关配置，如：
+
+```shell
+sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo
+```
+
+备份 EPEL (如有配置其他 epel 源)
+
+```shell
+mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.backup
+mv /etc/yum.repos.d/epel-testing.repo /etc/yum.repos.d/epel-testing.repo.backup
+```
+
+下载新的 EPEL
+
+```shell
+curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
 ```
 
 记得重建缓存。
@@ -119,7 +141,7 @@ Failed to establish a new connection: [Errno -3] Temporary failure in name resol
 解决方法是修改 `/usr/lib/sysctl.d/00-system.conf` 文件，在其中添加。
 
 ```ini
-net.ipv4.ip_forward=1
+net.ipv4.ip_forward = 1
 ```
 
 然后重启网络服务。
