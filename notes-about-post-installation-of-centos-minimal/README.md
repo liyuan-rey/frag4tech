@@ -115,7 +115,21 @@ mv /etc/yum.repos.d/epel-testing.repo /etc/yum.repos.d/epel-testing.repo.backup
 
 ```shell
 curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+
 ```
+
+或者
+
+```shell
+yum install epel-release
+
+mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.backup
+mv /etc/yum.repos.d/epel-testing.repo /etc/yum.repos.d/epel-testing.repo.backup
+
+sed -i 's|^#baseurl=http://download.fedoraproject.org/pub|baseurl=https://mirrors.aliyun.com|' /etc/yum.repos.d/epel*
+sed -i 's|^metalink|#metalink|' /etc/yum.repos.d/epel*
+```
+
 
 ### docker-ce
 
@@ -136,11 +150,50 @@ yum install https://mirrors.aliyun.com/postgresql/repos/yum/reporpms/EL-7-x86_64
 sed -i 's+download.postgresql.org/pub+mirrors.aliyun.com/postgresql+' /etc/yum.repos.d/pgdg-redhat-all.repo
 ```
 
+### Git
+
+centos-base 包源只有 git 老版本（1.8.3），epel 包源也没有新版 git。
+
+需要在 ius 包源安装新版 git （version > 2）。
+
+```shell
+yum install https://mirrors.aliyun.com/ius/ius-release-el7.rpm
+
+mv /etc/yum.repos.d/ius.repo /etc/yum.repos.d/ius.repo.backup
+mv /etc/yum.repos.d/ius-testing.repo /etc/yum.repos.d/ius-testing.repo.backup
+
+sed -i 's|repo.ius.io|mirrors.aliyun.com/ius|' /etc/yum.repos.d/ius*
+```
+
+安装社区预编译版224
+
+```shell
+yum install git224
+```
+
 记得重建缓存。
 
 ```shell
 yum clean all
 yum makecache
+```
+
+### 安装指定版本的软件
+
+以 docker-ce 为例。
+
+```shell
+# 安装指定版本的Docker-CE:
+# Step 1: 查找Docker-CE的版本:
+# yum list docker-ce.x86_64 --showduplicates | sort -r
+#   Loading mirror speeds from cached hostfile
+#   Loaded plugins: branch, fastestmirror, langpacks
+#   docker-ce.x86_64            17.03.1.ce-1.el7.centos            docker-ce-stable
+#   docker-ce.x86_64            17.03.1.ce-1.el7.centos            @docker-ce-stable
+#   docker-ce.x86_64            17.03.0.ce-1.el7.centos            docker-ce-stable
+#   Available Packages
+# Step2: 安装指定版本的Docker-CE: (VERSION例如上面的17.03.0.ce.1-1.el7.centos)
+# sudo yum -y install docker-ce-[VERSION]
 ```
 
 ## 设置网络转发和 DNS

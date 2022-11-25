@@ -21,3 +21,13 @@
 	autoDetach = false
 [core]
 	longpaths = true
+	autocrlf = false
+	editor = \"%LOCALAPPDATA%\\Programs\\Microsoft VS Code\\Code.exe\" --wait
+[i18n]
+	logoutputencoding = utf-8
+#[https]
+#	proxy = http://127.0.0.1:26180
+#[http]
+#	proxy = http://127.0.0.1:26180
+[http]
+	sslVerify = false
