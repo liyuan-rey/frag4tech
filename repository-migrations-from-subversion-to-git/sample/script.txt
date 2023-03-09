@@ -1,0 +1,238 @@
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+git svn clone --stdlayout --authors-file=D:\repos\authors.txt svn://localhost/*** xxx
+git push origin master
+
+### AniToolbox
+cd /d/codes/early
+svn checkout svn://localhost/AniToolbox AniToolbox
+cd AniToolbox
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir AniToolbox
+git svn clone --authors-file=/D/codes/authors.txt svn://localhost/AniToolbox AniToolbox
+cd AniToolbox
+git remote add origin https://github.com/liyuan-rey/AniToolbox.git
+git push -u origin master
+
+### APO
+cd /d/codes/early
+svn checkout svn://localhost/APO APO
+cd APO
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir APO
+git svn clone --stdlayout --authors-file=/D/codes/authors.txt svn://localhost/APO APO
+cd APO
+git remote add origin https://github.com/liyuan-rey/APO.git
+git push -u origin refs/heads/master:refs/heads/master
+
+### AtomicClock
+cd /d/codes/early
+svn checkout svn://localhost/AtomicClock AtomicClock
+cd AtomicClock
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir AtomicClock
+git svn clone --authors-file=/D/codes/authors.txt svn://localhost/AtomicClock AtomicClock
+cd AtomicClock
+git remote add origin https://github.com/liyuan-rey/AtomicClock.git
+git push origin refs/heads/master:refs/heads/master
+
+### coMoad
+cd /d/codes/early
+svn checkout svn://localhost/coMoad coMoad
+cd coMoad
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir coMoad
+git svn clone --stdlayout --authors-file=/D/codes/authors.txt svn://localhost/coMoad coMoad
+cd coMoad
+git remote add origin https://github.com/liyuan-rey/coMoad.git
+# git push -u origin master
+
+### dfempdm
+cd /d/codes/early
+svn checkout svn://localhost/dfempdm dfempdm
+cd dfempdm
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir dfempdm
+git svn clone --stdlayout --authors-file=/D/codes/authors.txt svn://localhost/dfempdm dfempdm
+cd dfempdm
+git remote add origin https://github.com/liyuan-rey/dfempdm.git
+# git push -u origin master
+
+### EasyBrowser
+cd /d/codes/early
+svn checkout svn://localhost/EasyBrowser EasyBrowser
+cd EasyBrowser
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir EasyBrowser
+git svn clone --authors-file=/D/codes/authors.txt svn://localhost/EasyBrowser EasyBrowser
+cd EasyBrowser
+git remote add origin https://github.com/liyuan-rey/EasyBrowser.git
+git push -u origin master
+
+### eesinfo
+cd /d/codes/early
+svn checkout svn://localhost/eesinfo eesinfo
+cd eesinfo
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir eesinfo
+git svn clone --authors-file=/D/codes/authors.txt svn://localhost/eesinfo eesinfo
+cd eesinfo
+git remote add origin https://github.com/liyuan-rey/eesinfo.git
+git push -u origin master
+
+### bookstore
+cd /d/codes/early
+svn checkout svn://localhost/bookstore bookstore
+cd bookstore
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir bookstore
+git svn clone --authors-file=/D/codes/authors.txt svn://localhost/emTian_bookstoreweb bookstore
+cd bookstore
+git remote add origin https://github.com/liyuan-rey/bookstore.git
+git push -u origin master
+
+### FileChecksum
+cd /d/codes/early
+svn checkout svn://localhost/FileChecksum FileChecksum
+cd FileChecksum
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir FileChecksum
+git svn clone --authors-file=/D/codes/authors.txt svn://localhost/FileChecksum FileChecksum
+cd FileChecksum
+git remote add origin https://github.com/liyuan-rey/FileChecksum.git
+git push -u origin master
+
+### IPix
+cd /d/codes/early
+svn checkout svn://localhost/IPix IPix
+cd IPix
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir IPix
+git svn clone --authors-file=/D/codes/authors.txt svn://localhost/IPix IPix
+cd IPix
+git remote add origin https://github.com/liyuan-rey/IPix.git
+git push -u origin master
+
+### resume
+cd /d/codes/early
+svn checkout svn://localhost/resume resume
+cd resume
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir resume
+git svn clone --stdlayout --authors-file=/D/codes/authors.txt svn://localhost/resume resume
+cd resume
+git remote add origin https://github.com/liyuan-rey/resume.git
+# git push -u origin master
+
+### SysMon
+cd /d/codes/early
+svn checkout svn://localhost/SysMon SysMon
+cd SysMon
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir SysMon
+git svn clone --authors-file=/D/codes/authors.txt svn://localhost/SysMon SysMon
+cd SysMon
+git remote add origin https://github.com/liyuan-rey/SysMon.git
+git push -u origin master
+
+### Tima
+cd /d/codes/early
+svn checkout svn://localhost/Tima Tima
+cd Tima
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir Tima
+git svn clone --stdlayout --authors-file=/D/codes/authors.txt svn://localhost/Tima Tima
+cd Tima
+git remote add origin https://github.com/liyuan-rey/Tima.git
+git push -u origin master
+
+### ToggleTop
+cd /d/codes/early
+svn checkout svn://localhost/ToggleTop ToggleTop
+cd ToggleTop
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir ToggleTop
+git svn clone --authors-file=/D/codes/authors.txt svn://localhost/ToggleTop ToggleTop
+cd ToggleTop
+git remote add origin https://github.com/liyuan-rey/ToggleTop.git
+git push -u origin master
+
+### TVMS
+cd /d/codes/early
+svn checkout svn://localhost/TVMS TVMS
+cd TVMS
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir TVMS
+git svn clone --trunk=TVMS/trunk --authors-file=/D/codes/authors.txt svn://localhost/TVMS TVMS
+cd TVMS
+git remote add origin https://github.com/liyuan-rey/TVMS.git
+git push -u origin master
+
+### UltraReplace
+cd /d/codes/early
+svn checkout svn://localhost/UltraReplace UltraReplace
+cd UltraReplace
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir UltraReplace
+git svn clone --authors-file=/D/codes/authors.txt svn://localhost/UltraReplace UltraReplace
+cd UltraReplace
+git remote add origin https://github.com/liyuan-rey/UltraReplace.git
+git push -u origin master
+
+### webmail
+cd /d/codes/early
+svn checkout svn://localhost/webmail webmail
+cd webmail
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir webmail
+git svn clone --authors-file=/D/codes/authors.txt svn://localhost/webmail webmail
+cd webmail
+git remote add origin https://github.com/liyuan-rey/webmail.git
+# git push -u origin master
+
+### WndTabsLangCHS
+cd /d/codes/early
+svn checkout svn://localhost/WndTabsLangCHS WndTabsLangCHS
+cd WndTabsLangCHS
+svn log -q | awk -F '|' '/^r/ {sub("^ ", "", $2); sub(" $", "", $2); print $2" = "$2" <"$2">"}' | LC_ALL=C sort -u > authors.txt
+
+cd /d/codes/new
+rmdir WndTabsLangCHS
+git svn clone --authors-file=/D/codes/authors.txt svn://localhost/WndTabsLangCHS WndTabsLangCHS
+cd WndTabsLangCHS
+git remote add origin https://github.com/liyuan-rey/WndTabsLangCHS.git
+# git push -u origin master
+
