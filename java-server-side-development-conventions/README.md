@@ -6,11 +6,11 @@
 
 |    技术点    |     选型      |  版本   | 说明             |
 | :----------: | :-----------: | :-----: | ---------------- |
-|  关系数据库  |  PostgreSQL   |  13.6+  |
+|  关系数据库  |  PostgreSQL   | 13.11+  |
 |   缓存服务   |     Redis     |  6.2+   |
 |   对象存储   |     MinIO     | 202202+ | 基于 S3 协议访问 |
 |  日志和检索  | Elasticsearch |         |
-| 统一认证服务 |   KeyCloak    |         |
+| 统一认证服务 |   Keycloak    |  22.0+  |
 |   API 网关   |    APISIX     | 2.15.0+ |
 
 ### 1.2. Java 开发
@@ -18,10 +18,14 @@
 |     技术点     |             选型              |         版本         | 说明                                        |
 | :------------: | :---------------------------: | :------------------: | ------------------------------------------- |
 |    编程语言    |             Java              |          17          |                                             |
-|    构建工具    |            Gradle             |         7.4+         | 默认采用自宿主（Tomcat）方式构建为 jar 包   |
-|    核心框架    |          Spring Boot          |        2.7.2+        |
+|    构建工具    |            Gradle             |         8.1+         | 默认采用自宿主（Tomcat）方式构建为 jar 包   |
+|    核心框架    |          Spring Boot          |         2.7+         |
 |      日志      | spring boot logging + logback | Spring Boot 依赖管理 |                                             |
 |    ID 生成     |         UidGenerator          |                      |
+|   JSON 处理    |            Jackson            | Spring Boot 依赖管理 |
+|    对象映射    |           MapStruct           |         1.5+         |
+|    工具类库    |        Apache Commons         | Spring Boot 依赖管理 |
+|     连接池     |           HikariCP            | Spring Boot 依赖管理 |
 | 数据访问-pgSQL |        spring-data-jpa        | Spring Boot 依赖管理 |
 | 数据访问-Redis |       spring-data-redis       | Spring Boot 依赖管理 |
 | 数据访问-MinIO |    MinIO Java SDK for  S3     |                      | https://github.com/minio/minio-java         |
