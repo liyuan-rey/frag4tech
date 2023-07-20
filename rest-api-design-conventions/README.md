@@ -4,7 +4,7 @@
 
 API 遵循 REST 标准进行设计。
 
- API 应是 __可预期的__ 以及 __面向资源__ 的，接受 form-encoded 请求正文，返回 JSON-encoded 响应， 使用标准的 HTTP 响应代码 ，认证（OAuth 2.0）和参数。
+API 应是 __可预期的__ 以及 __面向资源__ 的，接受 form-encoded 请求正文，返回 JSON-encoded 响应， 使用标准的 HTTP 响应代码 ，认证（OAuth 2.0）和参数。
 所有请求和响应的编码均为 UTF-8。
 
 ## 基础返回字段
@@ -71,6 +71,7 @@ URL Path 风格：`/qiming/{专项}/{版本号}/{子模块}/{资源}`
 约定 Path 不使用英文复数表达，比如使用 person 不使用 people，使用 task 不使用 tasks
 
 其中：
+
 - 专项：专项业务标识，例如：cms（内容平台业务）、examine（考试业务）
 - 版本号：接口版本号，例如：v1，v2 
 - 子模块： 专项下子模块，如果没有可以省略，例如：task（任务子模块）
@@ -105,7 +106,7 @@ POST    /qiming/cms/v1/person/1/(reset|invite|...)
 
 约定在 Apifox 做接口设计。设计完成后可以选择把 API 设计结果导出为 OpenAPI 3.0 YAML 格式，然后导入腾讯云 CODING 项目中的 API 文档，以便使用。
 
-原则上要求：
+建议：
 
 - 先在 Apifox 完成设计，再开始编码实现；
 - 不使用 Apifox 的自动生成客户端代码；
