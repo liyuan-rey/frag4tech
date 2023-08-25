@@ -111,7 +111,7 @@
 │      ├─main
 │      │  ├─java
 │      │  │  └─com
-│      │  │      └─gsafety
+│      │  │      └─chuangze
 │      │  │          └─qiming
 │      │  │              ├─training
 │      │  │              │  ├─dto
@@ -134,7 +134,7 @@
         ├─main
         │  ├─java
         │  │  └─com
-        │  │      └─gsafety
+        │  │      └─chuangze
         │  │          └─qiming
         │  │              ├─training
         │  │              │  └─controller
@@ -240,9 +240,57 @@
 
 构建镜像需要具备 Docker daemon 支持（本地或远程皆可）。第一次构建镜像需要下载 JDK 基础镜像，会花一些时间，后续构建会很快。
 
-## 7. 附：关于事务处理的一些经验
+## 7. 常见技术问题的处理
 
-### 7.1. 避免大事务
+### 7.1. JDK 选择
+
+Oracle JDK 有版权限制，不建议使用。
+
+开发用 OpenJDK 推荐这个：
+
+https://adoptium.net/zh-CN/temurin/archive/
+
+![jdk](jdk.png)
+
+### 7.2. 符合约定的 HTTP API 接口出参
+
+- 引入 qiming-common 包
+- 配置扫描包
+
+![scan](./scan.png)
+
+- 直接返回对象或基本类型，返回类型会被 ApiResult 类型包裹
+
+### 7.3. HTTP API 接口层异常处理
+
+捕获特定异常，转化为 ResponseStatusException 抛出即可，注意对应好 HTTP Error Code。
+
+![exception](./exception.png)
+
+### 7.4. HTTP API 接口公共方法的日志切面
+
+- 引入 qiming-common 包，其中的 ControllerLogAspect 做了日志切面
+- 配置扫描包即可
+
+![scan](./scan.png)
+
+不必为方法出入和入参单独做日志，其他日志可以根据需要做，注意采用合适的日志级别如 info warn debug 等。
+
+### 7.5. 分页返回采用 spring boot 内置方式
+
+![page](./page.png)
+
+### 7.6. 接口参数验证采用 validation 注解
+
+如有自定义验证需要可优雅扩展，不建议独立写。
+
+![api-validate](api-validate.png)
+
+![pojo-validate](pojo-validate.png)
+
+### 7.7. 关于事务处理的一些经验
+
+#### 7.7.1. 避免大事务
 
 - 错误写法
 
@@ -251,27 +299,27 @@
     public class DemoServiceImpl{
 
         @Autowired
-        XXXSerivce xxxSerivce;
+        XXXService xxxService;
 
         @Autowired
-        BBBSerivce bbbSerivce;
+        BBBService bbbService;
 
         @Autowired
-        CCC1Serivce ccc1Serivce;
+        CCC1Service ccc1Service;
 
 
         @Transactional
         public void bus() {
-            Entytiy1 entytiy1 = xxxSerivce.queryXXX();
-            Entytiy2 entytiy2 = bbbSerivce.rpcBBB();
-            Entytiy3 entytiy3 = ccc1Serivce.rpcCCCC();
+            Entity1 entity1 = xxxService.queryXXX();
+            Entity2 entity2 = bbbService.rpcBBB();
+            Entity3 entity3 = ccc1Service.rpcCCCC();
 
-            ccc1Serivce.save(entytiy1, entytiy2, entytiy3);
+            ccc1Service.save(entity1, entity2, entity3);
             afterhandle();
         }
 
         public void afterhandle() {
-            xxxSerivce.xxx();
+            xxxService.xxx();
         }
     }
     ```
@@ -283,36 +331,36 @@
     public class DemoServiceImpl{
 
         @Autowired
-        XXXSerivce xxxSerivce;
+        XXXService xxxService;
 
         @Autowired
-        BBBSerivce bbbSerivce;
+        BBBService bbbService;
 
         @Autowired
-        CCC1Serivce ccc1Serivce;
+        CCC1Service ccc1Service;
 
         public void bus() {
 
-            Entytiy1 entytiy1 = xxxSerivce.queryXXX();
-            Entytiy2 entytiy2 = bbbSerivce.rpcBBB();
-            Entytiy3 entytiy3 = ccc1Serivce.rpcCCCC();
+            Entity1 entity1 = xxxService.queryXXX();
+            Entity2 entity2 = bbbService.rpcBBB();
+            Entity3 entity3 = ccc1Service.rpcCCCC();
     
-            demoService.save(entytiy1, entytiy2, entytiy3);
+            demoService.save(entity1, entity2, entity3);
             afterhandle();
         }
 
     public void afterhandle() {
-            xxxSerivce.xxx();
+            xxxService.xxx();
         }
 
         @Transactional
-        public void save(Entytiy1 a, Entytiy2 b, Entytiy1 c) {
-            ccc1Serivce.save(a, b, c)
+        public void save(Entity1 a, Entity2 b, Entity3 c) {
+            ccc1Service.save(a, b, c)
         }
     }
     ```
 
-### 7.2. 事务失效
+#### 7.7.2. 事务失效
 
 - 错误写法
 
@@ -333,10 +381,10 @@
 - 正确写法
 
     ```java
-    @Servcie
-    publicclass ServiceA {
+    @Service
+    public class ServiceA {
         @Autowired
-        prvate ServiceA serviceA;
+        private ServiceA serviceA;
 
         public void save(User user) {
             queryData1();
@@ -352,6 +400,6 @@
     }
     ```
 
-### 7.3. 其他
+#### 7.7.3. 其他
 
 - 禁止在事务方法中调用三方服务api
