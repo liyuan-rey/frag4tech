@@ -14,3 +14,6 @@ There are articles and codes recorded in technical research.
 
 + DevOps
   + [搭建 DevOps 环境实战](./build-devops-environment-in-action)
+
+------
+[CC-BY-4.0](./LICENSE)
