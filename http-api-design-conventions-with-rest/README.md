@@ -23,7 +23,7 @@ API 应是 __可预期__ 的以及 __面向资源__ 的，接受 form-encoded �
 
 URL 形式为：
 
-```url
+```js
 http://ip:port/api/products?page=2&size=10&sort=name&sort=unitPrice,desc
 ```
 
