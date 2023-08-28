@@ -3,9 +3,9 @@
 layout: home
 
 hero:
-  name: "软件开发技术分享"
+  name: "软件研发技术分享"
   text: ""
-  tagline: 软件开发相关的技术内容分享和示例服务展示。
+  tagline: 软件研发相关的技术内容分享和示例服务展示。
   actions:
     - theme: brand
       text: HTTP API 设计
@@ -15,10 +15,10 @@ hero:
       link: /database-design-develop-guide-for-postgresql
 
 features:
-  - title: 系统架构
-    details: 软件系统的基本组织结构和设计原则
-  - title: 设计和开发
-    details: 将软件从概念转化为可运行的系统
-  - title: 研发管理
-    details: 进行计划、组织、协调和控制的一系列活动
+  - title: AI 辅助下的软件研发
+    details: 代码生成和自动化，缺陷检测和修复，自动化测试和验证，自动化文档生成，辅助项目管理和资源分配
+  - title: 系统架构、设计和开发
+    details: 系统的整体结构和组织方式，模块和组件的详细设计，功能和特性的具体实现
+  - title: 软件研发管理
+    details: 项目管理，团队管理，资源管理，质量管理等等
 ---
