@@ -1,4 +1,4 @@
-# 在 CentOS 7 (1511) 上安装 Prosody
+# 在 CentOS 7 上安装 Prosody 搭建 XMPP 聊天服务器
 
 Prosody 官网：https://prosody.im/
 
