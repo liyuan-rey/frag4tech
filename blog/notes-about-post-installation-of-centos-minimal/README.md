@@ -228,7 +228,7 @@ systemctl restart network
 
 此外，上面例子中的名字解析错误提示也可能是 DNS 配置错误造成的。可以检查和修改 `/etc/resolv.conf` 文件来解决，比如在文件中增加正确的 DNS 服务地址配置项。
 
-```plain
+```ini
 nameserver 114.114.114.114
 nameserver 8.8.8.8
 ```
@@ -241,7 +241,7 @@ nameserver 8.8.8.8
 
 在 SSH 服务端上修改配置文件 `/etc/ssh/sshd_config`，注意取消配置文件中这些项的 `#` 注释。
 
-```config
+```ssh-config
 TCPKeepAlive yes
 ClientAliveInterval 60
 ```
@@ -260,7 +260,7 @@ systemctl reload sshd
 
 在 ssh 客户端上修改配置文件 `$HOME/.ssh/config` 添加如下配置。
 
-```config
+```ssh-config
 ServerAliveInterval 60
 ServerAliveCountMax 3
 ```

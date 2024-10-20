@@ -150,7 +150,7 @@ git server 部署在内网，不面向用户，是内部使用的。对于部署
 + ubuntu-nginx
 + ubuntu-nginx-gitweb
 
-具体内容请参考：[Dockerfile](./Dockerfile)
+具体内容请参考：[Dockerfile](./docker-ubuntu-gitweb-nginx/Dockerfile)
 
 ```shell
 sudo docker image pull ubuntu

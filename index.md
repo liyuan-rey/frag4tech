@@ -9,10 +9,10 @@ hero:
   actions:
     - theme: brand
       text: HTTP API 设计
-      link: /http-api-design-conventions-no-rest
+      link: /blog/http-api-design-conventions-no-rest/
     - theme: alt
       text: 数据库设计
-      link: /database-design-develop-guide-for-postgresql
+      link: /blog/database-design-develop-guide-for-postgresql/
 
 features:
   - title: AI 辅助下的软件研发

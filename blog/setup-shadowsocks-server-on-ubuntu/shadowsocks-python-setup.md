@@ -45,7 +45,7 @@ vi ~/.pip/pip.conf
 
 在 pip.conf 中增加或修改以下配置：
 
-```conf
+```ini
 [global]
 index-url=https://mirrors.aliyun.com/pypi/simple/
 [install]
@@ -177,14 +177,14 @@ Optimize TCP Connection
 
 Increase TCP link limit add following configuration to /etc/security/limits.conf file:
 
-```conf
+```ini
 * soft nofile 51200
 * hard nofile 51200
 ```
 
 Add following configuration to /etc/sysctl.conf file:
 
-```conf
+```ini
 # max open files
 fs.file-max = 51200
 # max read buffer

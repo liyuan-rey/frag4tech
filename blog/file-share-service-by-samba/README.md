@@ -128,7 +128,7 @@
 
 ## 配置文件
 
-```conf
+```ini
 # See smb.conf.example for a more detailed config file or
 # read the smb.conf manpage.
 # Run 'testparm' to verify the config is correct after

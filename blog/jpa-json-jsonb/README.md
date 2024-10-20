@@ -10,7 +10,7 @@
 
 引用第三方库依赖，并用版本变量统一管理版本号：
 
-```gradle
+```groovy
 
   // build.gradle
 
