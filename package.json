@@ -1,0 +1,16 @@
+{
+    "name": "liyuan-blog",
+    "version": "1.0.0",
+    "description": "",
+    "author": "liyuan",
+    "license": "CC-BY-4.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vitepress dev",
+        "build": "vitepress build",
+        "preview": "vitepress preview"
+    },
+    "devDependencies": {
+        "vitepress": "^1.4.1"
+    }
+}
