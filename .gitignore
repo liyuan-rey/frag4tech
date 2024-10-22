@@ -1,8 +1,8 @@
 node_modules
-cache
+dist
+.vitepress/cache
 
 .DS_Store
-dist
 .cache
 .turbo
 

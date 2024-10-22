@@ -3,11 +3,20 @@ import { defineConfig } from "vitepress";
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
     lang: "zh-CN",
-    head: [["link", { rel: "icon", href: "/vitepress-logo-mini.svg" }]],
     title: "软件研发技术分享",
     description: "软件研发相关的技术内容分享和示例服务展示。",
+    cleanUrls: true,
     lastUpdated: true,
     ignoreDeadLinks: true,
+    head: [
+        [
+            "link",
+            {
+                rel: "icon",
+                href: "/vitepress-logo-mini.svg" 
+            }
+        ]
+    ],
     themeConfig: {
         // https://vitepress.dev/reference/default-theme-config
         logo: "/vitepress-logo-mini.svg",
