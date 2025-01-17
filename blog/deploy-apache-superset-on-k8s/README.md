@@ -82,8 +82,8 @@
     - 设置资源限额（可选）
     - 设置 Service 参数（可选）
 
-    > [!TIP]
-    > 如果是全新启动的 Deployment，面板默认登录账号 admin/admin，注意改密。
+> [!TIP]
+> 如果是全新启动的 Deployment，面板默认登录账号 admin/admin，注意改密。
 
 ## 一步一步从头开始
 
