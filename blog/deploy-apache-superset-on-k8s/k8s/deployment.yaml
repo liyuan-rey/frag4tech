@@ -1,0 +1,70 @@
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-superset
+  namespace: olap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apache-superset
+  template:
+    metadata:
+      labels:
+        app: apache-superset
+    spec:
+      volumes:
+      - name: vol-superset-config
+        configMap:
+          name: cm-superset-config
+          defaultMode: 420
+      - name: vol-superset-data
+        persistentVolumeClaim:
+          claimName: pvc-superset
+          readOnly: false
+      containers:
+      - name: apache-superset
+        image: apache/superset:3.1.3
+        ports:
+        - containerPort: 8088
+          protocol: TCP
+        env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: SUPERSET_SECRET_KEY
+          value: "your-secret-key"
+        - name: SUPERSET_CONFIG_PATH
+          value: /app/superset_config.py
+        volumeMounts:
+        - mountPath: /app/superset_config.py
+          name: vol-superset-config
+          subPath: superset_config.py
+          readOnly: true
+        - mountPath: /app/superset_home
+          name: vol-superset-data
+          # subPath: superset_home/superset.db
+          readOnly: false
+        # - mountPath: /app/superset_home/examples.db
+        #   name: vol-superset-data
+        #   subPath: superset_home/examples.db
+        #   readOnly: false
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8088
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8088
+          initialDelaySeconds: 5
+          periodSeconds: 10
