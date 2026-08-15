@@ -8,6 +8,12 @@ export default defineConfig({
     cleanUrls: true,
     lastUpdated: true,
     ignoreDeadLinks: true,
+    srcExclude: [
+        "AGENTS.md",
+        "README.md",
+        "TODO.md",
+        "blog/_drafts/**",
+    ],
     head: [
         [
             "link",
