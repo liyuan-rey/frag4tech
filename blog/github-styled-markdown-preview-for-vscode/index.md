@@ -74,20 +74,22 @@
         "markdown.styles": [
             "file:///%USERPROFILE%/github-markdown.css"
         ],
-        "markdown.preview.fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'HelveticaNeue-Light', 'Ubuntu', 'Droid Sans', sans-serif, 'Microsoft YaHei UI'",
+        "markdown.preview.fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'HelveticaNeue-Light', 'Ubuntu', 'Droid Sans', sans-serif, 'Microsoft YaHei UI'"
     }
     ```
 
-1. 如果使用了 `Markdown PDF` 插件，也可以做了相应配置，以便从 Markdown 导出 PDF 时也具有同样的样式效果：
+2. 如果使用了 Markdown PDF 插件，也可以做相应配置，以便从 Markdown 导出 PDF 时使用同样的样式：
 
     ```json
     {
         "markdown-pdf.styles": [
             "file:///%USERPROFILE%/github-markdown.css"
         ],
-        "markdown-pdf.highlightStyle": "github.css",
+        "markdown-pdf.highlightStyle": "github.css"
     }
-    ```
+```
+
+> VS Code 用户设置支持图形界面和 JSON 两种编辑方式。以上片段仅供合并参考，不要直接覆盖已有配置。插件配置项如有调整，应以当前插件文档为准。
 
 ## 其它问题
 

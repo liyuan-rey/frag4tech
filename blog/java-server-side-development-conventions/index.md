@@ -6,7 +6,7 @@
 
 |    技术点    |     选型      |  版本   | 说明             |
 | :----------: | :-----------: | :-----: | ---------------- |
-|  关系数据库  |  PostgreSQL   | 13.11+  |
+|  关系数据库  |  PostgreSQL   | 受支持的较新版本（15+） |
 |   缓存服务   |     Redis     |  6.2+   |
 |   对象存储   |     MinIO     | 202202+ | 基于 S3 协议访问 |
 |  日志和检索  | Elasticsearch |         |
@@ -17,9 +17,9 @@
 
 |     技术点     |             选型              |         版本         | 说明                                        |
 | :------------: | :---------------------------: | :------------------: | ------------------------------------------- |
-|    编程语言    |             Java              |          17          |                                             |
+|    编程语言    |             Java              |       21 LTS+        | 存量项目可继续使用 Java 17，但应有升级计划   |
 |    构建工具    |            Gradle             |         8.1+         | 默认采用自宿主（Tomcat）方式构建为 jar 包   |
-|    核心框架    |          Spring Boot          |         2.7+         |
+|    核心框架    |          Spring Boot          |         3.2+         | 新项目不建议选择已停止开源维护的 2.x 版本   |
 |      日志      | spring boot logging + logback | Spring Boot 依赖管理 |                                             |
 |    ID 生成     |         UidGenerator          |                      |
 |   JSON 处理    |            Jackson            | Spring Boot 依赖管理 |
@@ -33,6 +33,8 @@
 |      IDE       |         IntelliJ IDEA         |       较新版本       |
 |  代码生成插件  | Lombok, Easy Code, JPA Buddy  |       较新版本       |
 |  代码检查插件  |           SonarLint           |       较新版本       | alibaba-java-coding-guidelines 可以自选使用 |
+
+> 版本基线应结合团队安全维护周期和运行环境支持情况确认。升级 Spring Boot 2.x 到 3.x 时，需要同步评估 Java 版本、Jakarta EE 命名空间、依赖版本和配置项变化。
 
 ## 2. 编码规范和检查
 
@@ -181,7 +183,7 @@
 
 我们日常使用的镜像名称的通用格式为：DOCKER_REGISTRY/repo/name:tag，各个字段具体含义如下。
 
-- `DOCKER_REGISTRY`：企业统一的 Docker Registry 地址；使用：172.22.3.5:9002
+- `DOCKER_REGISTRY`：企业统一的 Docker Registry 地址；示例：`registry.example.com`
 - `repo`：镜像仓库，用来管理某一类镜像；本项目中是：qiming
 - `name`：某个镜像的具体名称。
 - `tag`：某个镜像具体的标签。例如：2.0.0。
@@ -214,9 +216,9 @@
 
 最终：
 
-镜像名称：172.22.3.5:9002/qiming/[代码工程名称]:[版本号]
+镜像名称：registry.example.com/qiming/[代码工程名称]:[版本号]
 
-例子：172.22.3.5:9002/qiming/qiming-training-webapi:1.0.1
+例子：registry.example.com/qiming/qiming-training-webapi:1.0.1
 
 ## 6. 容器镜像构建约定
 
@@ -244,7 +246,7 @@
 
 ### 7.1. JDK 选择
 
-Oracle JDK 有版权限制，不建议使用。
+优先选择 Eclipse Temurin 等 OpenJDK 发行版，并确认其支持周期。使用 Oracle JDK 相关发行版前，应先确认授权和支持条款。
 
 开发用 OpenJDK 推荐这个：
 

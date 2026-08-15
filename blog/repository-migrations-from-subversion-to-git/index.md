@@ -4,6 +4,16 @@
 
 > 注意：下述命令行是在 `Git Bash` 环境中执行的。
 
+## 迁移前检查
+
+迁移前建议先确认：
+
+- SVN 仓库采用的布局是否为 `trunk`、`branches`、`tags` 的标准布局；非标准布局需要调整 `git svn clone` 参数。
+- SVN 仓库当前版本号和提交记录是否可以正常读取。
+- 迁移执行机器是否有足够磁盘空间保存 SVN 工作副本和 Git 仓库。
+- 目标 Git 仓库应为空仓库，且不要在迁移验证完成前提供给团队正式使用。
+- 迁移只是生成新的 Git 历史，原 SVN 仓库应先保留，不要立即删除或停用。
+
 如果仓库在本地目录，如 `d:\svn-repos\my-repo`，可以用 svn 自带的 `svnserve` 程序在本地架设 svn 服务。
 
 ```shell
@@ -59,6 +69,39 @@ clone 成功后会形成一个新的 git 本地工作目录，其中有个名为
 cd /d/git-wk/my-repo
 git branch --list
 ```
+
+## 校验迁移结果
+
+推送前先在本地检查迁移结果：
+
+```shell
+cd /d/git-wk/my-repo
+
+# 查看最新提交信息、作者和日期
+git log --decorate --date=iso -n 10
+
+# 检查提交数量是否合理
+git rev-list --count HEAD
+
+# 检查导出的分支和标签
+git branch -a
+git tag -l
+
+# 检查关键目录和文件是否存在
+git ls-tree -r --name-only HEAD | less
+```
+
+如果项目有可构建的基线版本，应在本地检出迁移结果后执行构建和测试，确认源码内容没有缺失。
+
+## 失败处理和回滚
+
+常见的处理原则如下：
+
+- `git svn clone` 中断后，可进入已生成的 Git 仓库执行 `git svn fetch` 继续拉取。
+- 作者映射缺失时，应根据报错补充 `authors.txt` 后重新迁移，或按 `git svn` 文档使用作者兜底配置。
+- 迁移结果校验失败时，优先删除本次生成的 `/d/git-wk/my-repo` 并重新执行 `git svn clone`。
+- 在确认迁移结果正确前，不要执行 `git push`。
+- 如果错误提交已经推送到空远端仓库，且确认没有其他人使用，可以删除远端仓库后重建；不要习惯性使用强制推送覆盖他人工作。
 
 如果想将导入后的代码推送到远端 git 仓库，比如 github 上的 `new-repo` 则可以执行：
 

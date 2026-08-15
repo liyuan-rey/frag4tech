@@ -51,7 +51,7 @@
 
 ## 如何使用
 
-- 先利用 [./Dockfile](./Dockfile) 构建镜像，并推送到镜像仓库。
+- 先利用 [./Dockerfile](./Dockerfile) 构建镜像，并推送到镜像仓库。
 
     ```bash
     docker build -t my-superset:3.1.3 .
@@ -230,7 +230,7 @@ SQLALCHEMY_DATABASE_URI = (
 # )
 # use env like:
 #     export SUPERSET_METADB_URI='sqlite:////app/superset_home/superset.db?check_same_thread=false'
-#     export SUPERSET_METADB_URI='postgresql://superset:password@172.16.32.8:5432/superset
+#     export SUPERSET_METADB_URI='postgresql://superset:password@postgres.example.internal:5432/superset
 
 # Flask-WTF flag for CSRF
 WTF_CSRF_ENABLED = True
@@ -263,7 +263,7 @@ DEFAULT_FEATURE_FLAGS: dict[str, bool] = {
 
 # CORS Options
 ENABLE_CORS = True
-ALLOW_ORIGINS = ['http://192.168.101.129:8080','http://localhost:8080']
+ALLOW_ORIGINS = ['http://superset.example.local:8080','http://localhost:8080']
 CORS_OPTIONS: dict[Any, Any] = {
     'supports_credentials': True,
     'allow_headers': ['*'],

@@ -98,9 +98,9 @@ blog/java-server-side-development-conventions/
 
 处理事项：
 
-- [ ] 将 `README.md` 重命名为 `index.md`。
-- [ ] 检查 JDK、Spring Boot 相关版本表述，避免过时内容误导读者。
-- [ ] 检查图片链接和图片替代文本。
+- [x] 将 `README.md` 重命名为 `index.md`。
+- [x] 检查 JDK、Spring Boot 相关版本表述，避免过时内容误导读者。
+- [x] 检查图片链接和图片替代文本。
 - [ ] 加入“开发”分类侧边栏。
 
 ### 3.2 使用 JPA 访问 JSONB 字段
@@ -118,9 +118,9 @@ blog/jpa-json-jsonb/
 
 处理事项：
 
-- [ ] 将 `README.md` 重命名为 `index.md`。
-- [ ] 补充分节结构，例如依赖引入、实体映射、读写示例、查询示例。
-- [ ] 核对 Hibernate 5 / Spring Boot 2 与 Spring Boot 3 的写法差异。
+- [x] 将 `README.md` 重命名为 `index.md`。
+- [x] 补充分节结构，例如依赖引入、实体映射、读写示例、查询示例。
+- [x] 核对 Hibernate 5 / Spring Boot 2 与 Spring Boot 3 的写法差异。
 - [ ] 加入“开发”分类侧边栏。
 
 ### 3.3 Linux 运维操作基础
@@ -138,8 +138,8 @@ blog/linux-ops-basic/
 
 处理事项：
 
-- [ ] 校对命令在当前常用 Linux 发行版中的适用性。
-- [ ] 补充危险命令的注意提示。
+- [x] 校对命令在当前常用 Linux 发行版中的适用性。
+- [x] 补充危险命令的注意提示。
 - [ ] 加入“运维”分类侧边栏。
 
 ### 3.4 在 Kubernetes 中部署 Apache Superset
@@ -165,11 +165,11 @@ blog/deploy-apache-superset-on-k8s/
 
 处理事项：
 
-- [ ] 修正 `./Dockfile` 为 `./Dockerfile`。
-- [ ] 将本机 IP 替换为示例 IP 或域名。
-- [ ] 保留现有账号示例和默认账号说明。
-- [ ] 将 `README.md` 重命名为 `index.md`。
-- [ ] 检查密钥、数据库和配置文件的链接是否仍与保留策略一致。
+- [x] 修正 `./Dockfile` 为 `./Dockerfile`。
+- [x] 将文章中的本机 IP 替换为示例域名。
+- [x] 保留现有账号示例和默认账号说明。
+- [x] 将 `README.md` 重命名为 `index.md`。
+- [x] 检查密钥、数据库和配置文件的链接是否仍与保留策略一致。
 - [ ] 加入“运维”分类侧边栏。
 
 ### 3.5 在 VSCode 预览中使用 GitHub 的中文 Markdown 样式
@@ -186,9 +186,9 @@ blog/github-styled-markdown-preview-for-vscode/
 
 处理事项：
 
-- [ ] 将 `README.md` 重命名为 `index.md`。
-- [ ] 检查 VSCode 配置路径和样式文件链接。
-- [ ] 确认 `sample.pdf` 等附件是否必须随站点发布。
+- [x] 将 `README.md` 重命名为 `index.md`。
+- [x] 检查 VSCode 配置路径和样式文件链接。
+- [x] 确认 `sample.pdf` 附件保留，用于展示导出 PDF 效果。
 - [ ] 加入“工具”分类侧边栏。
 
 ### 3.6 面向非计算机专业研究者的 Python 使用指南
@@ -196,7 +196,7 @@ blog/github-styled-markdown-preview-for-vscode/
 路径：
 
 ```text
-blog/beginner's-guide-to-python-for-non-computer-researchers/
+blog/python-guide-for-non-computer-researchers/
 ```
 
 评估：
@@ -206,10 +206,10 @@ blog/beginner's-guide-to-python-for-non-computer-researchers/
 
 处理事项：
 
-- [ ] 将目录重命名为不含特殊字符的 kebab-case 名称。
-- [ ] 将 `README.md` 重命名为 `index.md`。
-- [ ] 将固定 Python 3.11.2 的表述调整为“示例版本”或更新到当前稳定版本。
-- [ ] 检查淘宝镜像链接是否有效。
+- [x] 将目录重命名为不含特殊字符的 kebab-case 名称。
+- [x] 将 `README.md` 重命名为 `index.md`。
+- [x] 将固定 Python 3.11.2 的表述调整为“历史截图示例”，并移除固定版本直链。
+- [x] 移除镜像站直链，改为通过官方下载页选择当前版本。
 - [ ] 加入“开发”分类侧边栏。
 
 ## 4. 整理后可发布文章
@@ -350,10 +350,10 @@ blog/repository-migrations-from-subversion-to-git/
 
 处理事项：
 
-- [ ] 将 `README.md` 重命名为 `index.md`。
-- [ ] 增加迁移前检查清单。
-- [ ] 增加迁移结果校验方法。
-- [ ] 增加失败处理和回滚说明。
+- [x] 将 `README.md` 重命名为 `index.md`。
+- [x] 增加迁移前检查清单。
+- [x] 增加迁移结果校验方法。
+- [x] 增加失败处理和回滚说明。
 - [ ] 加入“工具”分类侧边栏。
 
 ## 5. 移入草稿的文章
@@ -464,16 +464,16 @@ blog/run-dotnet-wpf-application-in-linux-with-wine/
 
 ### 第二批：发布核心开发与运维文章
 
-- [ ] Java 服务端开发约定
-- [ ] 使用 JPA 访问 JSONB 字段
-- [ ] Linux 运维操作基础
-- [ ] Apache Superset 部署
+- [x] Java 服务端开发约定（内容整理完成，暂不挂侧边栏）
+- [x] 使用 JPA 访问 JSONB 字段（内容整理完成，暂不挂侧边栏）
+- [x] Linux 运维操作基础（内容整理完成，暂不挂侧边栏）
+- [x] Apache Superset 部署（内容整理完成，暂不挂侧边栏）
 
 ### 第三批：发布工具与入门文章
 
-- [ ] VSCode Markdown 预览样式
-- [ ] Python 使用指南
-- [ ] SVN 到 Git 迁移
+- [x] VSCode Markdown 预览样式（内容整理完成，暂不挂侧边栏）
+- [x] Python 使用指南（内容整理完成，暂不挂侧边栏）
+- [x] SVN 到 Git 迁移（内容整理完成，暂不挂侧边栏）
 
 ### 第四批：逐篇整理后发布
 
