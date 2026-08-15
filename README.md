@@ -4,7 +4,7 @@
 
 ## 技术栈
 
-- VitePress 1.6.x
+- VitePress 2.0（alpha）
 - Node.js 24.x + Vite
 - fnm + corepack + pnpm 11.x
 - Vercel

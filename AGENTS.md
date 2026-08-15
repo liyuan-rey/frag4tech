@@ -4,7 +4,7 @@
 
 ## 技术栈
 
-- **框架**：VitePress 1.6.x
+- **框架**：VitePress 2.0（当前为 alpha 版本）
 - **运行时**：Node.js 24.x + Vite
 - **版本管理**：fnm 管理 Node.js，版本固定为 24
 - **包管理器**：corepack 启用 pnpm 11.x，版本由 `package.json` 中的 `packageManager` 字段固定
