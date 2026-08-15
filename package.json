@@ -6,6 +6,9 @@
     "license": "CC-BY-4.0",
     "private": true,
     "type": "module",
+    "engines": {
+        "node": "24.x"
+    },
     "scripts": {
         "dev": "vitepress dev",
         "build": "vitepress build",
@@ -13,7 +16,7 @@
         "preview": "vitepress preview"
     },
     "devDependencies": {
-        "vitepress": "^1.4.1"
+        "vitepress": "^1.6.4"
     },
-    "packageManager": "pnpm@9.12.2+sha512.22721b3a11f81661ae1ec68ce1a7b879425a1ca5b991c975b074ac220b187ce56c708fe5db69f4c962c989452eee76c82877f4ee80f474cebd61ee13461b6228"
+    "packageManager": "pnpm@11.21.0+sha512.521705bce689924eac72f5a3587122f362689ef6571e55ba80076fd637c11132ecffada26fad4ea79c485bfddbfd3d5a2a5b05805a77e893de71ec8a6cca3bb1"
 }
